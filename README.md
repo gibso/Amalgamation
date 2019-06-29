@@ -49,6 +49,28 @@ If you look at the settings.py, you'll also find a cadence fusion example to obt
 	- A priority of "-1" means that the axiom, operator, predicate or sort is fixed and not removable. 
 	
 
+#### Using docker
+To execute the blending with docker, you have to build an image, and run the image in a container.
+Therefore, in your project directory execute the following commands.
+
+Build an Image from the Dockerfile:
+```
+docker build -t "amalgamation" .
+```
+
+Create a docker container with the project files mounted (insert your local project directory path into `LOCAL_PROJECT_PATH`):
+
+```
+docker create --name=amalgamation -v LOCAL_PROJECT_PATH:/opt/project amalgamation
+```
+
+Run the Blending by starting your container in attached mode:
+```
+docker start -a amalgamation
+```
+
+
+
 ### Important limitations and TODOs
 	- Operator,  predicate and sort names must be disjoint in each specification, i.e. a operator name can 
 	not be a predicate name or a sort name. Furthermore, overloading of operators or predicates is not supported. Otherwise this will result in unpredictable behavior.
