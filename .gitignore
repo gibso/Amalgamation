@@ -4,3 +4,6 @@ Blend_v3234__G7_2_Bbmin_3_b_0.casl
 blendFiles.txt
 examples/demo_examples/tritone_demo.lp
 examples/demo_examples/tritone_demo_raw.casl
+
+# JetBrin IDE Files
+/.idea/
