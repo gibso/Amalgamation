@@ -7,3 +7,6 @@ examples/demo_examples/tritone_demo_raw.casl
 
 # JetBrin IDE Files
 /.idea/
+
+# Python compiled files
+*.pyc
