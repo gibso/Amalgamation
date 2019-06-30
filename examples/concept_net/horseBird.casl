@@ -1,0 +1,26 @@
+spec SemSys =
+  sort PriorityDummySort
+  op prioDummyOp : PriorityDummySort
+end
+
+spec Symbols = SemSys then
+ generated type Capability ::= sing | fly | run_quickly | jump_a_barrier
+end
+
+spec Animal = Symbols then
+    sort Animal
+    preds
+        isCapableOf : Animal * Capability
+end
+
+spec Bird = Animal then
+    op c:Animal
+    . isCapableOf(c, sing)
+    . isCapableOf(c, fly)
+end
+
+spec Horse = Animal then
+    op c:Animal
+    . isCapableOf(c, run_quickly)
+    . isCapableOf(c, jump_a_barrier)
+end
