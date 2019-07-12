@@ -1,6 +1,5 @@
 import xml.etree.ElementTree as ET
 import subprocess
-import os
 import copy
 import time
 from string import *
@@ -8,8 +7,7 @@ import re
 from settings import *
 
 from auxFunctions import *
-
-import requests
+import hets_helper
 
 # from FOL import *
 
@@ -18,21 +16,6 @@ axEqClasses = {}
 
 # caslToLpNameMap = {}
 # lpToCaslNameMap = {}
-
-def generate_files_from(file, output_type):
-    filesParam = {'file': file}
-    hetsapi_url = os.environ['HETSAPI_INTERNAL_URL']
-    th_generator_url = f"http://{hetsapi_url}/generator/{output_type}"
-    res = requests.post(th_generator_url, files=filesParam)
-    if res.status_code != 204:
-        raise Exception(f'could not generate .{output_type} files.')
-
-
-def get_generic_filename_for(file):
-    # remove path from filename
-    base_filename = os.path.basename(file.name)
-    # remove ending from filename
-    return os.path.splitext(base_filename)[0]
 
 
 ### input2Xml translates CASL input spaces to an xml file. The xml simplifies the CASL parsing. 
@@ -46,10 +29,10 @@ def input2Xml(fName,inputSpaces):
     ##TBD: call HETS axInvolvesPredOp
 
     casl_file = open(fName, 'rb')
-    generate_files_from(casl_file, 'th')
+    hets_helper.generate_files_from(casl_file, 'th')
     print("Done generating casl .th files using HETS")
 
-    generic_filename = get_generic_filename_for(casl_file)
+    generic_filename = hets_helper.get_generic_filename_for(casl_file)
 
     # Second read the input spaces to be blended in CASL syntax from .th files and concatenate the strings.
     newFileContent = ""
@@ -72,10 +55,10 @@ def input2Xml(fName,inputSpaces):
     # xmlFileName = newFileName.split(".")[0]+".xml"
 
     print("Calling hets to generate xml file for parsing")
-    generate_files_from(raw_casl_file, 'xml')
+    hets_helper.generate_files_from(raw_casl_file, 'xml')
     print("Done calling hets to generate xml")
 
-    generic_raw_filename = get_generic_filename_for(raw_casl_file)
+    generic_raw_filename = hets_helper.get_generic_filename_for(raw_casl_file)
 
     xmlFileName = f"/data/xml/{generic_raw_filename}.xml"
     xmlFile = open(xmlFileName, "r")
