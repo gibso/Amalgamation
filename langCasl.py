@@ -25,7 +25,7 @@ def generate_files_from(file, output_type):
     th_generator_url = f"http://{hetsapi_url}/generator/{output_type}"
     res = requests.post(th_generator_url, files=filesParam)
     if res.status_code != 204:
-        raise Exception('could not generate .th files.')
+        raise Exception(f'could not generate .{output_type} files.')
 
 
 def get_generic_filename_for(file):
