@@ -8,20 +8,20 @@ import json
 
 def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
     global blendValuePercentageBelowMinToKeep
-    # generalizationCost = sys.maxint
-    if highestValue == -sys.maxint:
-        minBlendValueToConsider = -sys.maxint
+    # generalizationCost = float("inf")
+    if highestValue == -float("inf"):
+        minBlendValueToConsider = -float("inf")
     else:
         minBlendValueToConsider = highestValue - int(float(highestValue) / float(100) * float(blendValuePercentageBelowHighestValueToKeep))
 
     # Parse model and execute actions on internal data structure to obtain the generalized inut spaces. 
     genInputSpaces = getGeneralizedSpaces(modelAtoms, inputSpaces)
 
-    # print "specs:"
-    # print genInputSpaces.keys()
+    # print("specs:")
+    # print(genInputSpaces.keys())
     # for specTypeList in genInputSpaces.values():
     #     for spec in specTypeList:
-    #         print spec.toCaslStr()
+    #         print(spec.toCaslStr())
 
     # # Get possible combinations of generalization combinations
     blendCombis = getBlendCombiCost(genInputSpaces)
@@ -46,8 +46,8 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
             specTo = spec
             specFrom = genInputSpaces["Generic"][0]
             renamings = getRenamingsFromModelAtoms(modelAtoms,specFrom,specTo,specName)
-            # print mappingStr
-            # print renamings
+            # print(mappingStr)
+            # print(renamings)
             
 
             if len(renamings.keys()) > 0:
@@ -56,7 +56,7 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
                     mappingStr = mappingStr + lpToCaslStr(renamings[step][1]) + " |-> " + lpToCaslStr(renamings[step][0]) + ", "
                 mappingStr = mappingStr[:-2]
 
-                    # print act
+                    # print(act)
                 # if atom.find("exec(renameOp(") != -1:
                     # atomSpec = 
             mappingStr = mappingStr + " end\n\n"
@@ -67,7 +67,7 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
     for value in sorted(blendCombis.keys(),reverse=True):
         if value < minBlendValueToConsider:
             continue
-        print "Specifying blends with generalization value of " + str(value) 
+        print("Specifying blends with generalization value of " + str(value))
         for combi in blendCombis[value]:            
             cstr = cstr + "spec Blend" + "_v"+str(value)+ "_"
             for specName in combi.keys():
@@ -78,17 +78,17 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
             for specName in combi.keys():
                 caslSpecName = lpToCaslStr(specName)
                 specList = genInputSpaces[caslSpecName]
-                # print specName
-                # print combi
-                # print int(combi[specName])
-                # print len(specList)
+                # print(specName)
+                # print(combi)
+                # print(int(combi[specName]))
+                # print(len(specList))
                 specStep = int(combi[specName])
                 spec = specList[specStep]
                 cstr = cstr + "GenTo"+spec.name+","
             cstr = cstr[:-1]
             cstr = cstr + " end\n\n"
     
-    # print cstr
+    # print(cstr)
     # First make sure file does not exists, and then write file. Try writing multiple times (this is necessary due to some strange file writing bug...)
     if os.path.isfile("amalgamTmp.casl"):
         os.system("rm -rf amalgamTmp.casl")
@@ -100,16 +100,16 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
         outFile.close()
         tries = tries + 1
         if tries > 5:
-            print "ERROR! file amalgamTmp.casl not yet written after "+ str(tries) + "tries. Aborting program... "
+            print("ERROR! file amalgamTmp.casl not yet written after "+ str(tries) + "tries. Aborting program... ")
             exit(1)
     # raw_input()
-    generalizationValue = -sys.maxint-1
+    generalizationValue = -float("inf")-1
     consistentFound = False
     for value in sorted(blendCombis.keys(),reverse=True):
         
-        print "Trying blends with generalization value of " + str(value)
+        print("Trying blends with generalization value of " + str(value))
         if value < minBlendValueToConsider:
-            print "value "  +str(value) + " < " + str(minBlendValueToConsider) + " too low, aborting..."
+            print("value "  +str(value) + " < " + str(minBlendValueToConsider) + " too low, aborting...")
             break
 
         # TODO: do not blend if generic space is reached. 
@@ -122,7 +122,7 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
                 blendName = blendName + "_" + lpToCaslStr(specName) + "_" + str(step)
             # blendName += "-v"+str(value)
 
-            print "Checking consistency of " + blendName + ""
+            print("Checking consistency of " + blendName + "")
             #generate tptp format of theory and call eprover to check consistency
             blendTptpName = "amalgamTmp_"+blendName+".tptp"
             tries = 0
@@ -138,14 +138,14 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
                 if blendFileSize != 0:
                     break
                 
-                print "generating tptp because " + blendTptpName + " file was not found"
+                print("generating tptp because " + blendTptpName + " file was not found")
                 ###TBD call HETS API
                 subprocess.call([hetsExe, "-o tptp", "amalgamTmp.casl"])
-                print "Done generating tptp"
+                print("Done generating tptp")
                 # This is a hack because hets sometimes seems to not generate all .tptp files. So we just try again and again until its working. 
                 tries = tries + 1
                 if tries > 15:
-                    print "ERROR: File "+blendTptpName+" not yet written correctly "+ str(tries) + " times! Aborting..."
+                    print("ERROR: File "+blendTptpName+" not yet written correctly "+ str(tries) + " times! Aborting...")
                     exit(1)
 
             thisCombiConsistent = checkConsistency(blendTptpName)
@@ -162,12 +162,12 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
                 # consistentFound = True
                 # If a better blend was found, delete all previous blends. 
                 if value > highestValue:
-                    #print 'tptpfile name is '+blendTptpName;
+                    #print('tptpfile name is '+blendTptpName;)
                     
         
                     highestValue = value
                     minBlendValueToConsider = highestValue - int(float(highestValue) / float(100) * float(blendValuePercentageBelowHighestValueToKeep))
-                    print "New best value: " + str(value) + ". Resetting global list of blends and keeping only blends with a value of at least " + str(minBlendValueToConsider) + ", i.e., " + str(blendValuePercentageBelowHighestValueToKeep) + "% below new highest value of " + str(highestValue) + "."
+                    print("New best value: " + str(value) + ". Resetting global list of blends and keeping only blends with a value of at least " + str(minBlendValueToConsider) + ", i.e., " + str(blendValuePercentageBelowHighestValueToKeep) + "% below new highest value of " + str(highestValue) + ".")
                     newBlends = []
                     # raw_input()
                     for blend in blends:
@@ -184,7 +184,7 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
     
 def prettyPrintBlend(genInputSpaces,combi,modelAtoms):
 
-    print "Pretty printing blend"
+    print("Pretty printing blend")
 
     lastSpecs = {}
 
@@ -247,7 +247,7 @@ def prettyPrintBlend(genInputSpaces,combi,modelAtoms):
 
     cstr = cstr + blendStr
 
-    print "End Pretty printing blend"
+    print("End Pretty printing blend")
 
     return cstr
 
@@ -257,13 +257,13 @@ def writeJsonOutput(blends,inputSpaceNames):
     jsonOutput['blendList'] = []
     
     
-    print inputSpaceNames
+    print(inputSpaceNames)
     blendNr = 1
     for blend in blends:
         jsonBlend = {}
         
         blendStr = blend['prettyHetsStr']
-        print 'Blend'+str(blendNr)
+        print('Blend'+str(blendNr))
                
         genericSpacePattern = "(spec\sGeneric.*?end)"
         jsonBlend['blendId'] = str(blendNr)
@@ -283,7 +283,7 @@ def writeJsonOutput(blends,inputSpaceNames):
                 genSpaceName= '_'+'gen'+'_'+str(combi[toLPName(inputSpace,'spec')])
             else:
                 genSpaceName=''
-            print 'TETEET:' + genSpaceName
+            print('TETEET:' + genSpaceName)
             genericSpacePattern = "(spec\s"+inputSpace+"(?=)"+genSpaceName+".*?end)"
             
             match = re.search(genericSpacePattern,blendStr,re.DOTALL)
@@ -322,7 +322,7 @@ def generateBlend(blend):
             thFileSize = os.stat(thName).st_size
 
         if tries > 15:
-            print "ERROR: file " + thName + " not yet written in " + str(tries) + " times ! Aborting..."
+            print("ERROR: file " + thName + " not yet written in " + str(tries) + " times ! Aborting...")
             exit(1)                
         tries = tries + 1            
 
@@ -388,7 +388,7 @@ def writeBlends(blends):
                 thFileSize = os.stat(thName).st_size
 
             if tries > 15:
-                print "ERROR: file " + thName + " not yet written in " + str(tries) + " times ! Aborting..."
+                print("ERROR: file " + thName + " not yet written in " + str(tries) + " times ! Aborting...")
                 exit(1)                
             tries = tries + 1            
 
@@ -442,7 +442,7 @@ def getBlendCombiCost(genInputSpaces):
                 continue
             if specName1 == specName2:
                 continue
-            # print "specs: " + specName1 + specName2
+            # print("specs: " + specName1 + specName2)
 
             gs1Ctr = 0
             for genSpace1 in genInputSpaces[specName1]:
@@ -458,14 +458,14 @@ def getBlendCombiCost(genInputSpaces):
                     if value not in combis.keys():
                         combis[value] = []
                     combis[value].append(copy.deepcopy(combi))
-                    # print value
+                    # print(value)
                     gs2Ctr = gs2Ctr + 1
                 gs1Ctr = gs1Ctr + 1
         # TODO: This only works for two input spaces.
         # Have to break here, because otherwise blends will be specified twice. I.e., the combi S1_5 and S2_3 plus the combi S2_3 and S1_5 will be produced.
         break
-    # print "combis:"
-    # print combis[-30]
+    # print("combis:")
+    # print(combis[-30])
     # exit(1)
     return combis
 
@@ -485,7 +485,7 @@ def getBlendCombiCost(genInputSpaces):
 #         combi = {}
 #         # combinedGenCost(spec_Boat,6,spec_House,2,38,7).
 #         argItems = str(atom).split("(")[1].split(")")[0].split(",")
-#         # print argItems
+#         # print(argItems)
 #         combi[argItems[0]] = int(argItems[1])-1
 #         combi[argItems[2]] = int(argItems[3])-1
 #         # cost is the cost of the combination
@@ -500,11 +500,11 @@ def checkConsistency(blendTptpName):
     consistent = checkConsistencyEprover(blendTptpName)
 
     if consistent == -1:
-        print "Consistency could not be determined by eprover, trying darwin"                
+        print("Consistency could not be determined by eprover, trying darwin")
         consistent = checkConsistencyDarwin(blendTptpName)
         # if consistent == 0 or consistent == 1:
             # os.system("echo \"eprover could not determine inconsistency but darwn could for blend " + blendTptpName + "\" > consistencyCheckFile.tmp")
-            # print("eprover could not determine (in)consistency but darwn could for blend " + blendTptpName + ". Result: " + str(consistent) + ". Press key to continue.")
+            # print("eprover could not determine (in)consistency but darwn could for blend " + blendTptpName + ". Result: " + str(consistent) + ". Press key to continue."))
             # raw_input()
 
     return consistent
@@ -519,7 +519,7 @@ def checkConsistencyEprover(blendTptpName) :
             resFile.close()
             
             if tries > 5:
-                print "ERROR!!! File consistencyRes.log not written by eprover after "+ str(tries) + " tries. Aborting..."
+                print("ERROR!!! File consistencyRes.log not written by eprover after "+ str(tries) + " tries. Aborting...")
                 exit(0)
             tries = tries + 1
 
@@ -530,14 +530,14 @@ def checkConsistencyEprover(blendTptpName) :
         os.system("rm -rf consistencyRes.log")
 
         if res.find("# No proof found!") != -1 or res.find("# Failure: Resource limit exceeded") != -1:
-            print "Eprover: No consistency proof found."
+            print("Eprover: No consistency proof found.")
             return -1
 
         if res.find("SZS status Unsatisfiable") != -1:
-            print "Eprover: Blend inconsistent."
+            print("Eprover: Blend inconsistent.")
             return 0
         
-        print "Eprover: Blend consistent."
+        print("Eprover: Blend consistent.")
         return 1
 
 def checkConsistencyDarwin(blendTptpName) :
@@ -547,16 +547,16 @@ def checkConsistencyDarwin(blendTptpName) :
 
         status,output,error = darwinCmd.run(timeout=darwinTimeLimit)
 
-        # print output
+        # print(output)
         cVal = -1
         if output.find("ABORTED termination") != -1:
-            print "Consistency check w. darwin failed: TIMEOUT" 
+            print("Consistency check w. darwin failed: TIMEOUT")
             cVal = -1
         if output.find("SZS status Satisfiable") != -1:
-            print "Consistency check w. darwin succeeds: CONSISTENT"
+            print("Consistency check w. darwin succeeds: CONSISTENT")
             cVal = 1
         if output.find("SZS status Unsatisfiable") != -1:
-            print "Consistency check w. darwin succeeds: INCONSISTENT"
+            print("Consistency check w. darwin succeeds: INCONSISTENT")
             cVal = 0
         
         # raw_input()
@@ -575,7 +575,7 @@ def getRenamingsFromModelAtoms(modelAtoms,specFrom,specTo,origCaslSpecName):
                 continue
             
             if act["actType"] == "renameOp":
-                # print "renameOp happens"
+                # print("renameOp happens")
                 # Add renaming only if operator is in target spec.
                 rnToExists = False
                 for op in specTo.ops:                        

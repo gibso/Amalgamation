@@ -22,7 +22,7 @@ from langCasl import *
 from blendFunctions import *
 from auxFunctions import *
 
-# print "starting generalisation"
+# print("starting generalisation")
 
 # Global variable required for the blending: the input spaces in the internal data structure represenation. 
 inputSpaces = []
@@ -31,26 +31,26 @@ inputSpaces = []
 blends = []
 
 # Global variable to store the max. allowed cost for a blend. 
-highestValue = -sys.maxint
+highestValue = -float("inf")
 
 # This is called if a model is found.
 def onModelGeneralize(model):    
     global inputFile, highestValue, blends
     lpFileName = inputFile.split(".")[0]+".lp"
 
-    print "Found generalisation:"
+    print("Found generalisation:")
     modelStr = getModel(model)
-    ## print modelStr
+    ## print(modelStr)
     # return
     [blends,blendingGeneralizationValue] = findLeastGeneralizedBlends(model.atoms(), inputSpaces, highestValue, blends) 
-    # print blendingGeneralizationValue  
-    if blendingGeneralizationValue >= highestValue and blendingGeneralizationValue > -sys.maxint:
+    # print(blendingGeneralizationValue)
+    if blendingGeneralizationValue >= highestValue and blendingGeneralizationValue > -float("inf"):
         highestValue = blendingGeneralizationValue
 
         #writeBlends(blends)
         jsonOutput = writeJsonOutput(blends,inputSpaceNames)
 
-        #print jsonOutput
+        #print(jsonOutput)
 
         blendJsonList = jsonOutput['blendList']
        
@@ -59,22 +59,22 @@ def onModelGeneralize(model):
             os.system("rm -rf blend.json")
             outFile = open('blend.json',"w")
             outFile.write(json.dumps(blendJson))
-            #print blendJson
+            #print(blendJson)
             outFile.close()
             
-            print 'Other blend? (n) '
+            print('Other blend? (n) ')
             sys.stdout.flush()
             x = raw_input()
             
             if x == 'n':
                break;
-        print 'finished'
+        print('finished')
         sys.stdout.flush()
-        #print "Found blend with a better or equal generalization value of  " + str(highestValue) + "."
+        #print("Found blend with a better or equal generalization value of  " + str(highestValue) + ".")
         # raw_input()
 
 def getModel(model):
-    print "%% Generalisation model is as follows : \n"
+    print("%% Generalisation model is as follows : \n")
     mStr = ''
     for a in model.atoms():
         mStr += str(a)+".\n"    
@@ -89,7 +89,7 @@ def main(prg):
     ## Prepare internal data structure for the later blending. 
     global inputSpaceNames, inputSpaces, inputFile
     
-    print "Starting main iteration loop. Reading input spaces."
+    print("Starting main iteration loop. Reading input spaces.")
 
 
     inputSpacesXmlFileName = input2Xml(inputFile,inputSpaceNames) 
