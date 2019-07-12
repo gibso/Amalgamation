@@ -23,4 +23,4 @@ lpFile.write(lpRep)
 lpFile.close()
 print("Generated Logic Programming facts from CASL Spec.")
 
-subprocess.call(["clingo", "--number="+str(numModels), "--quiet", "iterationGeneralize-py.lp", "caslInterface.lp", "generalize.lp", lpFileName])
+subprocess.call(["clingo", "--number="+str(numModels), "--quiet", "iterationGeneralize.py.lp", "caslInterface.lp", "generalize.lp", lpFileName])
