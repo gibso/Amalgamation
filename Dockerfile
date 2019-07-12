@@ -1,4 +1,7 @@
-FROM python:latest
+FROM continuumio/anaconda3:latest
+
+# install patassco clingo
+RUN conda install --yes --channel potassco clingo
 
 # add workdir for mounting the project
 RUN mkdir /opt/project
@@ -8,5 +11,5 @@ WORKDIR /opt/project
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-# for this entrypoint, you have to mount the project folder into /opt/project
+# start the blending process
 CMD ["python", "run-blending.py"]
