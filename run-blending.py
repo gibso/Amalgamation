@@ -23,13 +23,4 @@ lpFile.write(lpRep)
 lpFile.close()
 print("Generated Logic Programming facts from CASL Spec.")
 
-is_64bits = sys.maxsize > 2**32
-
-# Invoke clingo4 and run 
-if is_64bits:
-	print( "Running on 64 bit...\n")
-	subprocess.call(["./64bit/./clingo4", "--number="+str(numModels), "--quiet", "iterationGeneralize-py.lp", "caslInterface.lp", "generalize.lp", lpFileName])
-else:
-	print("Running on 32 bit...\n")
-	subprocess.call(["./32bit/./clingo4", "--number="+str(numModels), "--quiet", "iterationGeneralize-py.lp", "caslInterface.lp", "generalize.lp", lpFileName])	
-
+subprocess.call(["clingo", "--number="+str(numModels), "--quiet", "iterationGeneralize-py.lp", "caslInterface.lp", "generalize.lp", lpFileName])
