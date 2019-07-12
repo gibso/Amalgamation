@@ -401,7 +401,7 @@ class CaslAx:
             if item in vars:
                 continue
             predOpNames[item] = True
-        self.involvedPredsOps = copy.deepcopy(predOpNames.keys())
+        self.involvedPredsOps = copy.deepcopy(list(predOpNames.keys()))
 
 
 # This is the main method to turn the xml representation of input spaces into the internal data structure
