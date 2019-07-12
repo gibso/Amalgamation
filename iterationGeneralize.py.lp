@@ -13,7 +13,7 @@ lp_path = os.path.abspath(os.getcwd())
 sys.path.append(lp_path)
 
 # The gringo library contains all important python methods used by clingo.
-from gringo import *
+from clingo import *
 
 
 # We also want to be able to call the other amalgamation module python scripts.
@@ -42,7 +42,7 @@ def onModelGeneralize(model):
     modelStr = getModel(model)
     ## print(modelStr)
     # return
-    [blends,blendingGeneralizationValue] = findLeastGeneralizedBlends(model.atoms(), inputSpaces, highestValue, blends) 
+    [blends,blendingGeneralizationValue] = findLeastGeneralizedBlends(model.symbols(), inputSpaces, highestValue, blends)
     # print(blendingGeneralizationValue)
     if blendingGeneralizationValue >= highestValue and blendingGeneralizationValue > -float("inf"):
         highestValue = blendingGeneralizationValue
@@ -76,7 +76,7 @@ def onModelGeneralize(model):
 def getModel(model):
     print("%% Generalisation model is as follows : \n")
     mStr = ''
-    for a in model.atoms():
+    for a in model.symbols():
         mStr += str(a)+".\n"    
     return mStr
 
@@ -110,9 +110,9 @@ def main(prg):
     
     # These external options are currentl not working. They are intended to disallow generalization operations for particuar domains to improve searhc performance. For now, to realise this, (de)comment respective rules in generalize.lp file manually.
     
-    # if rmOpAllowed : prg.assign_external(Fun("rmOpAllowed", [] ), True)
-    # if rmPredAllowed : prg.assign_external(Fun("rmPredAllowed", []), True)
-    # if rmAxAllowed : prg.assign_external(Fun("rmAxAllowed", []), True)
+    # if rmOpAllowed : prg.assign_external(Function("rmOpAllowed", [] ), True)
+    # if rmPredAllowed : prg.assign_external(Function("rmPredAllowed", []), True)
+    # if rmAxAllowed : prg.assign_external(Function("rmAxAllowed", []), True)
         
     # #### First, find a path to the generic space
 
@@ -126,9 +126,9 @@ def main(prg):
         prg.ground(parts)
         parts = []
         # Release the query1(t) atom from the last slice (step-1) from the program. 
-        prg.release_external(Fun("query", [stepGeneralize-1]))
+        prg.release_external(Function("query", [stepGeneralize-1]))
         # Add the atom query1(t) of this slice to the program. 
-        prg.assign_external(Fun("query", [stepGeneralize]), True)
+        prg.assign_external(Function("query", [stepGeneralize]), True)
 
         # Find Stable Models for this generalization iteration
         ret = prg.solve(None, onModelGeneralize)
@@ -138,7 +138,7 @@ def main(prg):
                 
 
         # If Stable Models are found and we are beyond the minimal number of slices, break loop.
-        if stepGeneralize >= (imin-1) and (ret == SolveResult.SAT): break
+        if stepGeneralize >= (imin-1) and (ret == SolveResult.satisfiable): break
         stepGeneralize = stepGeneralize+1
 
 

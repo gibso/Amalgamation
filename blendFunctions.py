@@ -1,4 +1,4 @@
-from gringo import *
+from clingo import *
 import os, sys, time, subprocess, threading, shlex
 from settings import *
 from langCasl import *

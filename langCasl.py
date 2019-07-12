@@ -872,7 +872,7 @@ def getEquivalenceClass(axStr):
 def renameEleAndGetNewEqClass(eqClassId,element,eleFrom,eleTo):
     global axEqClasses
 
-    axStr = axEqClasses[int(eqClassId)]
+    axStr = axEqClasses[eqClassId.number]
     # print("renaming " + str(eleFrom) + " to " + str(eleTo) + " in axiom " + str(axStr))
     newAxStr = re.sub("(?<!\w)"+lpToCaslStr(str(eleFrom))+"(?!\w)",lpToCaslStr(str(eleTo)),axStr)
     # print(" result " + newAxStr)
