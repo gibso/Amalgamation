@@ -19,6 +19,22 @@ axEqClasses = {}
 # caslToLpNameMap = {}
 # lpToCaslNameMap = {}
 
+def generate_files_from(file, output_type):
+    filesParam = {'file': file}
+    hetsapi_url = os.environ['HETSAPI_INTERNAL_URL']
+    th_generator_url = f"http://{hetsapi_url}/generator/{output_type}"
+    res = requests.post(th_generator_url, files=filesParam)
+    if res.status_code != 204:
+        raise Exception('could not generate .th files.')
+
+
+def get_generic_filename_for(file):
+    # remove path from filename
+    base_filename = os.path.basename(file.name)
+    # remove ending from filename
+    return os.path.splitext(base_filename)[0]
+
+
 ### input2Xml translates CASL input spaces to an xml file. The xml simplifies the CASL parsing. 
 ### Input:  CASL file name and names of input spaces
 ### Output: The path to an xml file representing the input spaces.     
@@ -26,44 +42,19 @@ def input2Xml(fName,inputSpaces):
     global hetsExe
     # First generate .th files from CASL files. 
     #To be sure that all .th files have been generated repeat this 5 times. This is necessary because file generation via command line turned out to be buggy,
-    allGenerated = False
-    tries = 0
-    while True:
-        print("Generating Casl .th files using HETS from " + fName)
-        ##TBD: call HETS axInvolvesPredOp
+    print("Generating Casl .th files using HETS from " + fName)
+    ##TBD: call HETS axInvolvesPredOp
 
-        files = {'file': open(fName, 'rb')}
+    casl_file = open(fName, 'rb')
+    generate_files_from(casl_file, 'th')
+    print("Done generating casl .th files using HETS")
 
-        hetsapi_url = os.environ['HETSAPI_INTERNAL_URL']
-        th_generator_url = "http://{}/generator/th".format(hetsapi_url)
-        res = requests.post(th_generator_url, files=files)
+    generic_filename = get_generic_filename_for(casl_file)
 
-
-        print("Done generating casl .th files using HETS")
-        # raw_input()
-        allGenerated = True
-        for spec in inputSpaces:
-            specThFName = fName.split(".")[0]+"_"+spec+".th"
-            # print("th fle name" + specThFName)
-            if os.path.isfile(specThFName):
-                thFileSize = os.stat(specThFName).st_size
-            else:
-                thFileSize = 0
-            if thFileSize == 0:
-                allGenerated = False
-                break
-        if allGenerated == True:
-             break        
-        if tries > 5:
-            print("ERROR: file " + specThFName + " not yet written in " + str(tries) + " times ! Aborting...")
-            sys.exit(1)                
-        tries = tries + 1
-
-       
-    # Second read the input spaces to be blended in CASL syntax from .th files and concatenate the strings. 
+    # Second read the input spaces to be blended in CASL syntax from .th files and concatenate the strings.
     newFileContent = ""
     for spec in inputSpaces:
-        thFileName = fName.split(".")[0]+"_"+spec+".th"
+        thFileName = f"/data/th/{generic_filename}_{spec}.th"
         tmpFile = open(thFileName, "r")
         tmp = tmpFile.read()
         newFileContent = newFileContent + tmp
@@ -72,46 +63,26 @@ def input2Xml(fName,inputSpaces):
     newFile = open(newFileName, "w")
     newFile.write(newFileContent)
     newFile.close()
+    raw_casl_file = open(newFileName, "r")
 
     #Clean up and remove temporary theory files...
-    os.system("rm " + fName.split(".")[0]+"*.th")
+    # os.system("rm " + fName.split(".")[0]+"*.th")
 
     # Third, generate xml file from concatenated CASL input spaces. As above, this is buggy, so we make sure that the xml file is generated correctly by trying 5 times. 
-    xmlFileName = newFileName.split(".")[0]+".xml"
-    
-    tries = 0
-    # print("Generating xml file for parsing.")
-    if os.path.isfile(xmlFileName):
-        os.system("rm " + xmlFileName)
-    while True:
-        xmlFileSize = 0
-        if os.path.isfile(xmlFileName):
-            statinfo = os.stat(xmlFileName)
-            xmlFileSize = statinfo.st_size
-        if xmlFileSize != 0:
-            # print("Calling parseXml method")
-            try:
-                tree = ET.parse(xmlFileName)
-                # print("End calling parseXml method")
-                break
-            except ET.ParseError:
-                print("xml parse error, trying again...")
+    # xmlFileName = newFileName.split(".")[0]+".xml"
 
-        if tries > 5:
-            print("ERROR: File " + xmlFileName + " not yet written correctly after " + str(tries) + " tries! Aborting... :::::::")
-            exit(1)
-        tries = tries + 1
-        print("Calling hets to generate xml file for parsing")
-        ### TBD call hets
-        if useHetsAPI == 0:
-            subprocess.call([hetsExe, "-o xml", newFileName])
-        else:
-            subprocess.call(["wget", hetsUrl+'dg/demo_examples%2ftritone_demo.casl?format=xml&node=G7&node=Bbmin', "-O", xmlFileName])
-        #wget http://localhost:8000/demo_examples%2ftritone_demo.casl?format=xml -O test.xml       
-        print("Done calling hets to generate xml")
-    
+    print("Calling hets to generate xml file for parsing")
+    generate_files_from(raw_casl_file, 'xml')
+    print("Done calling hets to generate xml")
+
+    generic_raw_filename = get_generic_filename_for(raw_casl_file)
+
+    xmlFileName = f"/data/xml/{generic_raw_filename}.xml"
+    xmlFile = open(xmlFileName, "r")
+    statinfo = os.stat(xmlFileName)
+    xmlFileSize = statinfo.st_size
+    ET.parse(xmlFileName)
       
-    #os.remove(newFileName)
     return xmlFileName
 
 ## This class represents a predicate in CASL. 
