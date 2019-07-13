@@ -9,6 +9,8 @@ from settings import *
 
 from auxFunctions import *
 
+import requests
+
 # from FOL import *
 
 axMap = {}
@@ -27,15 +29,22 @@ def input2Xml(fName,inputSpaces):
     allGenerated = False
     tries = 0
     while True:
-        print "Generating Casl .th files using HETS from " + fName
+        print("Generating Casl .th files using HETS from " + fName)
         ##TBD: call HETS axInvolvesPredOp
-        subprocess.call([hetsExe, "-o th", fName])
-        print "Done generating casl .th files using HETS"        
+
+        files = {'file': open(fName, 'rb')}
+
+        hetsapi_url = os.environ['HETSAPI_INTERNAL_URL']
+        th_generator_url = "http://{}/generator/th".format(hetsapi_url)
+        res = requests.post(th_generator_url, files=files)
+
+
+        print("Done generating casl .th files using HETS")
         # raw_input()
         allGenerated = True
         for spec in inputSpaces:
             specThFName = fName.split(".")[0]+"_"+spec+".th"
-            # print "th fle name" + specThFName
+            # print("th fle name" + specThFName)
             if os.path.isfile(specThFName):
                 thFileSize = os.stat(specThFName).st_size
             else:
@@ -46,8 +55,8 @@ def input2Xml(fName,inputSpaces):
         if allGenerated == True:
              break        
         if tries > 5:
-            print "ERROR: file " + specThFName + " not yet written in " + str(tries) + " times ! Aborting..."
-            exit(1)                
+            print("ERROR: file " + specThFName + " not yet written in " + str(tries) + " times ! Aborting...")
+            sys.exit(1)                
         tries = tries + 1
 
        
@@ -71,7 +80,7 @@ def input2Xml(fName,inputSpaces):
     xmlFileName = newFileName.split(".")[0]+".xml"
     
     tries = 0
-    # print "Generating xml file for parsing."
+    # print("Generating xml file for parsing.")
     if os.path.isfile(xmlFileName):
         os.system("rm " + xmlFileName)
     while True:
@@ -80,26 +89,26 @@ def input2Xml(fName,inputSpaces):
             statinfo = os.stat(xmlFileName)
             xmlFileSize = statinfo.st_size
         if xmlFileSize != 0:
-            # print "Calling parseXml method"
+            # print("Calling parseXml method")
             try:
                 tree = ET.parse(xmlFileName)
-                # print "End calling parseXml method"
+                # print("End calling parseXml method")
                 break
             except ET.ParseError:
-                print "xml parse error, trying again..."
-        
+                print("xml parse error, trying again...")
+
         if tries > 5:
-            print "ERROR: File " + xmlFileName + " not yet written correctly after " + str(tries) + " tries! Aborting... :::::::"
+            print("ERROR: File " + xmlFileName + " not yet written correctly after " + str(tries) + " tries! Aborting... :::::::")
             exit(1)
         tries = tries + 1
-        print "Calling hets to generate xml file for parsing"
+        print("Calling hets to generate xml file for parsing")
         ### TBD call hets
         if useHetsAPI == 0:
             subprocess.call([hetsExe, "-o xml", newFileName])
         else:
-            subprocess.call(["wget", hetsUrl+'dg/demo_examples%2ftritone_demo.casl?format=xml&node=G7&node=Bbmin', "-O", xmlFileName]) 
+            subprocess.call(["wget", hetsUrl+'dg/demo_examples%2ftritone_demo.casl?format=xml&node=G7&node=Bbmin', "-O", xmlFileName])
         #wget http://localhost:8000/demo_examples%2ftritone_demo.casl?format=xml -O test.xml       
-        print "Done calling hets to generate xml"
+        print("Done calling hets to generate xml")
     
       
     #os.remove(newFileName)
@@ -301,28 +310,28 @@ class CaslSpec:
                 continue
             oStr = oStr + ax.toLPStr(self.name) + "\n"        
 
-        # print "opToCaslMap:"
-        # print lpToCaslMapping
+        # print("opToCaslMap:")
+        # print(lpToCaslMapping)
         return oStr
     def setInfoValue(self):
         self.infoValue = 0
         for sort in self.sorts:
             if sort.priority > 0:
                 self.infoValue = sort.priority + self.infoValue
-                # print "Adding infoValue" + str(sort.priority) + " for sort " + sort.name
-        # print "Sorts Set info value to " + str(self.infoValue)
+                # print("Adding infoValue" + str(sort.priority) + " for sort " + sort.name)
+        # print("Sorts Set info value to " + str(self.infoValue))
         for op in self.ops:
             if op.priority > 0:
                 self.infoValue = op.priority + self.infoValue
-        # print "Ops Set info value to " + str(self.infoValue)
+        # print("Ops Set info value to " + str(self.infoValue))
         for pred in self.preds:
             if pred.priority > 0:
                 self.infoValue = pred.priority + self.infoValue
-        # print "Preds Set info value to " + str(self.infoValue)
+        # print("Preds Set info value to " + str(self.infoValue))
         for ax in self.axioms:
             if ax.priority > 0:
                 self.infoValue = ax.priority  + self.infoValue
-        # print "Ax Set info value to " + str(self.infoValue)
+        # print("Ax Set info value to " + str(self.infoValue))
         # raw_input()
 
 class CaslAx:    
@@ -375,8 +384,8 @@ class CaslAx:
         # first extract quantifications
         axStr = copy.deepcopy(text)
         
-        # print "parsing axiom"
-        # print axStr    
+        # print("parsing axiom")
+        # print(axStr)
 
         qId = 0
         axStr = axStr.replace("\n", "")
@@ -390,11 +399,11 @@ class CaslAx:
             match = re.search(pattern,tmpAxStr)
             if match == None:
                 break
-            # print match.group(0)
+            # print(match.group(0))
             tmpAxStr = re.sub(pattern,"",tmpAxStr,count=1)
             self.involvedSorts[match.group(0)[3:]] = True
 
-        # print self.involvedSorts.keys()
+        # print(self.involvedSorts.keys())
 
         # Identify variables in axiom (needed to distinguish from operators and predicates)
 
@@ -405,8 +414,8 @@ class CaslAx:
             match = re.search(pattern,tmpAxStr)
             if match == None:
                 break
-            # print "varMatch"
-            # print match.group(0)
+            # print("varMatch")
+            # print(match.group(0))
             varArr = re.split("[\s.=(),:><;\n\\\\/]|not|forall|exists|exists!|",match.group(0))
             varArr = list(set(varArr) - set(self.involvedSorts.keys()))
             vars = vars | set(varArr)
@@ -430,9 +439,9 @@ class CaslAx:
 def parseXml(xmlFile):
     global axMap
     specs = []
-    # print "Calling parseXml method"
+    # print("Calling parseXml method")
     tree = ET.parse(xmlFile)
-    # print "End calling parseXml method"
+    # print("End calling parseXml method")
     dGraph = tree.getroot()
     ctr = 0  
     axCtr = 0 
@@ -446,7 +455,7 @@ def parseXml(xmlFile):
         specName = dgNode.attrib['refname']
         thisSpec = CaslSpec(specName)
         thisSpec.id = len(specs)
-        # print "found spec " + specName
+        # print("found spec " + specName)
         
 
         # First scan axioms to get the following meta-information:
@@ -473,7 +482,7 @@ def parseXml(xmlFile):
                                 prioInfo = entry.attrib['name'].split("--")
                                 for prioInfoItem in prioInfo:
                                     if len(prioInfoItem.split(":p:")) != 2:
-                                        print "WARNING!!! priority information " + prioInfoItem + " in wrong format. Expecting <ElementName>:p:<priorityNumber>. Assigning priority 0 instead."
+                                        print("WARNING!!! priority information " + prioInfoItem + " in wrong format. Expecting <ElementName>:p:<priorityNumber>. Assigning priority 0 instead.")
                                     # prioInfoItem is a strings of the form <ElementName>_<PriorityNumber>
                                     thisPrioNumber = int(prioInfoItem.split(":p:")[1])
                                     thisPrioElementName = prioInfoItem.split(":p:")[0]
@@ -519,8 +528,8 @@ def parseXml(xmlFile):
                         
                     if entry.attrib['kind'] == 'op':
                         op = CaslOp.byStr(entry.text)
-                        # print "op"
-                        # print op.name 
+                        # print("op")
+                        # print(op.name)
                         if op.name in opAndSortPriorities[specName].keys():
                             op.priority = opAndSortPriorities[specName][op.name]
                         else:
@@ -531,7 +540,7 @@ def parseXml(xmlFile):
                             op.priority = 0
                         else:
                             op.isDataOp = False
-                            # print op.name + " is not removable"
+                            # print(op.name + " is not removable")
 
                         if op.name == "prioDummyOp":
                             op.priority = 0
@@ -599,10 +608,10 @@ def toLP(caslSpecs):
     return lpStr
     
 def getActFromAtom(a):    
-    # print a
+    # print(a)
     if a[:4] != "exec":
-        print "Error, this is not an action atom."
-        exit(0)
+        print("Error, this is not an action atom.")
+        sys.exit(0)
     actStr = a[5:-1]
     act = {}
     actStrArr = actStr.split(",")
@@ -615,7 +624,7 @@ def getActFromAtom(a):
             break
         atomicActStr = atomicActStr + item + ","
     atomicActStr = atomicActStr[:-1]
-    # print atomicActStr
+    # print(atomicActStr)
     act["actType"] = atomicActStr.split("(")[0]
     act["argVect"] = atomicActStr.split("(")[1][:-1].split(",")
     return act
@@ -653,7 +662,7 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
                     infoValue = 0
                     genCost = 0
                     for act in acts[step][iSpace]:
-                        # print act
+                        # print(act)
                         if act["actType"] == "rmOp" :
                             for op in cSpec.ops:
                                 if toLPName(op.name,"po") == act["argVect"][0]:
@@ -733,8 +742,8 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
                                 ax.axStr = newAxStr
                                 # ax.id = axMap[newAxStr]
                             
-                            # print "renaming predicate from " + lpToCaslStr(pFrom) + " to " + lpToCaslStr(pTo) + ". Press key..."
-                            # print cSpec.toCaslStr()
+                            # print("renaming predicate from " + lpToCaslStr(pFrom) + " to " + lpToCaslStr(pTo) + ". Press key...")
+                            # print(cSpec.toCaslStr())
                             # raw_input()
 
                         # if act["actType"] == "renamedToPred" :
@@ -754,7 +763,7 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
                         if act["actType"] == "renameSort" :
                             sFrom = act["argVect"][0]
                             sTo = act["argVect"][1]
-                            print "renaming sort " + sFrom + " to " + sTo
+                            print("renaming sort " + sFrom + " to " + sTo)
                             for s in cSpec.sorts:
                                 if toLPName(s.name,"sort") == sFrom:
                                     cSpec.sorts.remove(s)
@@ -826,8 +835,8 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
                     thisCSpec.totalSteps = step
                     # thisCSpec.compressionValue = compressionValue
                     generalizations[cSpec.name].append(thisCSpec)
-                    # print "generalization"
-                    # print thisCSpec.toCaslStr()
+                    # print("generalization")
+                    # print(thisCSpec.toCaslStr())
                     # raw_input()
 
     # add one last generic cSpec
@@ -842,8 +851,8 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
         for spec in specList:
             spec.setInfoValue()
              
-            print spec.toCaslStr()
-    # exit(1)
+            print(spec.toCaslStr())
+    # sys.exit(1)
 
     return generalizations
 
@@ -853,27 +862,27 @@ def getNewAxIdOpRename(axId,op1,op2):
     op1Str = str(op1)
     op2Str = str(op2)
     global axMap
-    # print "Assigning new axiom Id after renaming " + str(op1Str) + " to " + str(op2Str)
+    # print("Assigning new axiom Id after renaming " + str(op1Str) + " to " + str(op2Str))
     # TODO: This is probably very slow. I have to find another data type that allows of 1-1 mappings with hashing. 
     reverseAxMap = {value:key for key, value in axMap.iteritems()}
     # get original axiom string
     axStr = reverseAxMap[axInt]
     # Now apply renaming operations. Replace ech occurrence of op1, that is not surrounded by alphanumerical symbols a-zA-Z0-9 (encoded as \w in regex), with op2
     newAxStr = re.sub("(?<!\w)"+op1Str+"(?!\w)", op2Str, axStr)
-    # print "Replaced " + axStr + " with " + newAxStr
-    # exit(0)
+    # print("Replaced " + axStr + " with " + newAxStr)
+    # sys.exit(0)
     # now add new string to global axiom dictionary if it does not exist already.
     if newAxStr in axMap.keys():
         axId = axMap[newAxStr]
-        # print "New ax exists. ID: " + str(axId)
+        # print("New ax exists. ID: " + str(axId))
     else:
         if len(axMap.keys()) == 0:
             # this should not happen because there should be at least one axiom when renaming an axiom.
-            print "WARNING!! This should not happen. In function: getAxIdOpRename, in langCasl.py"
-            exit(0)
+            print("WARNING!! This should not happen. In function: getAxIdOpRename, in langCasl.py")
+            sys.exit(0)
         else:
             axId = max(axMap.values())+1
-        # print "New ax does not exist. ID: " + str(axId)
+        # print("New ax does not exist. ID: " + str(axId))
         axMap[newAxStr] = axId
     return axId
 
@@ -893,9 +902,9 @@ def renameEleAndGetNewEqClass(eqClassId,element,eleFrom,eleTo):
     global axEqClasses
 
     axStr = axEqClasses[int(eqClassId)]
-    # print "renaming " + str(eleFrom) + " to " + str(eleTo) + " in axiom " + str(axStr)
+    # print("renaming " + str(eleFrom) + " to " + str(eleTo) + " in axiom " + str(axStr))
     newAxStr = re.sub("(?<!\w)"+lpToCaslStr(str(eleFrom))+"(?!\w)",lpToCaslStr(str(eleTo)),axStr)
-    # print " result " + newAxStr
+    # print(" result " + newAxStr)
     return getEquivalenceClass(newAxStr)
 
 def isEquivalent(axStr1,axStr2):

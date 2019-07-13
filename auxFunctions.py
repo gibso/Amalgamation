@@ -15,7 +15,7 @@ def toLPName(caslName,elemType):
 def lpToCaslStr(lpName):
     uScorePos = lpName.find("_")
     if uScorePos == -1:
-        print "Error, lpname invalid"
+        print("Error, lpname invalid")
         exit(1)
     return lpName[uScorePos+1:]
 
@@ -41,7 +41,7 @@ class Command(object):
         def target(**kwargs):
             try:
                 self.process = subprocess.Popen(self.command, **kwargs)
-                # print self.command
+                # print(self.command)
                 self.output, self.error = self.process.communicate()
                 self.status = self.process.returncode
             except:
