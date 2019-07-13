@@ -1,72 +1,46 @@
 import xml.etree.ElementTree as ET
-import subprocess
 import copy
-import time
-from string import *
 import re
-from settings import *
 
 from auxFunctions import *
 import hets_helper
 
-# from FOL import *
-
 axMap = {}
 axEqClasses = {}
 
-# caslToLpNameMap = {}
-# lpToCaslNameMap = {}
-
-
-### input2Xml translates CASL input spaces to an xml file. The xml simplifies the CASL parsing. 
+### input2Xml translates CASL input spaces to an xml file. The xml simplifies the CASL parsing.
 ### Input:  CASL file name and names of input spaces
 ### Output: The path to an xml file representing the input spaces.     
-def input2Xml(fName,inputSpaces):    
-    global hetsExe
-    # First generate .th files from CASL files. 
-    #To be sure that all .th files have been generated repeat this 5 times. This is necessary because file generation via command line turned out to be buggy,
-    print("Generating Casl .th files using HETS from " + fName)
-    ##TBD: call HETS axInvolvesPredOp
+def input2Xml(fName, input_spaces):
 
+    # First generate .th files from CASL files.
     casl_file = open(fName, 'rb')
-    hets_helper.generate_files_from(casl_file, 'th')
-    print("Done generating casl .th files using HETS")
+    th_files = hets_helper.generate_th_files_from(casl_file)
 
+    # filter the th files for the two input spaces
+    input_space_th_files = []
+    for input_space in input_spaces:
+        input_space_th_files += list(filter(lambda file: input_space in file.name, th_files))
+
+    # concatenante the two input space files into one new file
+    new_file_content = ''
+    for file in input_space_th_files:
+        new_file_content += file.read()
+
+    # write the content into a new file
     generic_filename = hets_helper.get_generic_filename_for(casl_file)
+    input_spaces_casl_file_path = f'/data/casl/{generic_filename}_input_spaces.casl'
+    input_spaces_casl_file = open(input_spaces_casl_file_path, "w")
+    input_spaces_casl_file.write(new_file_content)
+    input_spaces_casl_file.close()
 
-    # Second read the input spaces to be blended in CASL syntax from .th files and concatenate the strings.
-    newFileContent = ""
-    for spec in inputSpaces:
-        thFileName = f"/data/th/{generic_filename}_{spec}.th"
-        tmpFile = open(thFileName, "r")
-        tmp = tmpFile.read()
-        newFileContent = newFileContent + tmp
-    
-    newFileName = fName.split(".")[0]+"_raw.casl"
-    newFile = open(newFileName, "w")
-    newFile.write(newFileContent)
-    newFile.close()
-    raw_casl_file = open(newFileName, "r")
+    # open file in reading mode
+    input_spaces_casl_file = open(input_spaces_casl_file.name, "r")
 
-    #Clean up and remove temporary theory files...
-    # os.system("rm " + fName.split(".")[0]+"*.th")
-
-    # Third, generate xml file from concatenated CASL input spaces. As above, this is buggy, so we make sure that the xml file is generated correctly by trying 5 times. 
-    # xmlFileName = newFileName.split(".")[0]+".xml"
-
-    print("Calling hets to generate xml file for parsing")
-    hets_helper.generate_files_from(raw_casl_file, 'xml')
-    print("Done calling hets to generate xml")
-
-    generic_raw_filename = hets_helper.get_generic_filename_for(raw_casl_file)
-
-    xmlFileName = f"/data/xml/{generic_raw_filename}.xml"
-    xmlFile = open(xmlFileName, "r")
-    statinfo = os.stat(xmlFileName)
-    xmlFileSize = statinfo.st_size
-    ET.parse(xmlFileName)
-      
-    return xmlFileName
+    # generate xml file for the new input spaces file
+    xml_file = hets_helper.generate_files_from(input_spaces_casl_file, 'xml')[0]
+    ET.parse(xml_file.name)
+    return xml_file.name
 
 ## This class represents a predicate in CASL. 
 class CaslPred:
