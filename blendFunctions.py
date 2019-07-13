@@ -4,7 +4,7 @@ from settings import *
 from langCasl import *
 from itertools import *
 import json
-
+import hets_helper
 
 def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
     global blendValuePercentageBelowMinToKeep
@@ -87,22 +87,16 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
                 cstr = cstr + "GenTo"+spec.name+","
             cstr = cstr[:-1]
             cstr = cstr + " end\n\n"
-    
-    # print(cstr)
-    # First make sure file does not exists, and then write file. Try writing multiple times (this is necessary due to some strange file writing bug...)
-    if os.path.isfile("amalgamTmp.casl"):
-        os.system("rm -rf amalgamTmp.casl")
 
-    tries = 0
-    while not os.path.isfile("amalgamTmp.casl") :        
-        outFile = open("amalgamTmp.casl","w")
-        outFile.write(cstr)
-        outFile.close()
-        tries = tries + 1
-        if tries > 5:
-            print("ERROR! file amalgamTmp.casl not yet written after "+ str(tries) + "tries. Aborting program... ")
-            exit(1)
+    amalgam_tmp_filepath = "/data/casl/amalgam_tmp.casl"
+    outFile = open(amalgam_tmp_filepath,"w")
+    outFile.write(cstr)
+    outFile.close()
+
+    if not os.path.isfile(amalgam_tmp_filepath) :
+        raise Exception(f'could not write file {amalgam_tmp_filepath}')
     # raw_input()
+
     generalizationValue = -float("inf")-1
     consistentFound = False
     for value in sorted(blendCombis.keys(),reverse=True):
@@ -140,7 +134,8 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
                 
                 print("generating tptp because " + blendTptpName + " file was not found")
                 ###TBD call HETS API
-                subprocess.call([hetsExe, "-o tptp", "amalgamTmp.casl"])
+                amalgam_tmp_file = open(amalgam_tmp_filepath, 'rb')
+                tptp_files = hets_helper.generate_tptp_files_from(amalgam_tmp_file)
                 print("Done generating tptp")
                 # This is a hack because hets sometimes seems to not generate all .tptp files. So we just try again and again until its working. 
                 tries = tries + 1

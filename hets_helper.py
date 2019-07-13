@@ -5,10 +5,10 @@ import glob
 hetsapi_url = os.environ['HETSAPI_INTERNAL_URL']
 
 def generate_th_files_from(file):
-    generated_files = generate_files_from(file, 'th')
-    print(generated_files)
-    return generated_files
+    return generate_files_from(file, 'th')
 
+def generate_tptp_files_from(file):
+    return generate_files_from(file, 'tptp')
 
 def generate_files_from(file, output_type):
     filesParam = {'file': file}
