@@ -22,8 +22,10 @@ def generate_files_from(file, output_type):
     return list(map(lambda filepath: open(filepath), generated_filepaths))
 
 
-def get_generic_filename_for(file):
+def get_generic_filename_for(file=None, filename=None):
+    if file:
+        return get_generic_filename_for(filename=file.name)
     # remove path from filename
-    base_filename = os.path.basename(file.name)
+    base_filename = os.path.basename(filename)
     # remove ending from filename
     return os.path.splitext(base_filename)[0]

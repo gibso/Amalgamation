@@ -28,7 +28,7 @@ def input2Xml(fName, input_spaces):
         new_file_content += file.read()
 
     # write the content into a new file
-    generic_filename = hets_helper.get_generic_filename_for(casl_file)
+    generic_filename = hets_helper.get_generic_filename_for(file=casl_file)
     input_spaces_casl_file_path = f'/data/casl/{generic_filename}_input_spaces.casl'
     input_spaces_casl_file = open(input_spaces_casl_file_path, "w")
     input_spaces_casl_file.write(new_file_content)
