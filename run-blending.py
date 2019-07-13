@@ -1,7 +1,7 @@
 from langCasl import *
 import os, glob
 import subprocess
-
+import hets_helper
 from settings import *
 
 def remove_all_output_files():
@@ -28,7 +28,8 @@ print("\n\n\n")
 # Generate the Logic Programming representation of the CASL input spaces. 
 lpRep = toLP(inputSpaces)
 lpRep = "#program base.\n\n" + lpRep
-lpFileName = fName.split(".")[0]+".lp"
+generic_file_name = hets_helper.get_generic_filename_for(filename=fName)
+lpFileName =  f'/data/lp/{generic_file_name}.lp'
 lpFile = open(lpFileName,'w')
 lpFile.write(lpRep)
 lpFile.close()
