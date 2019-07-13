@@ -1,8 +1,19 @@
 from langCasl import *
-import os, sys
+import os, glob
 import subprocess
 
 from settings import *
+
+def remove_all_output_files():
+    for output_type in ['th', 'xml', 'casl', 'tp']:
+        remove_output_files(output_type)
+
+def remove_output_files(file_type):
+    fileList = glob.glob(f'/data/{file_type}/*.{file_type}')
+    for fileName in fileList:
+        os.remove(fileName)
+
+remove_all_output_files()
 
 fName = inputFile
 
