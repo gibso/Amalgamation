@@ -18,7 +18,7 @@ def generate_files_from(file, output_type):
     if res.status_code != 204:
         raise Exception(f'could not generate .{output_type} files.')
 
-    generated_filepaths = glob.glob(f'/data/{output_type}/*.{output_type}')
+    generated_filepaths = glob.glob(f'/data/*.{output_type}')
     return list(map(lambda filepath: open(filepath), generated_filepaths))
 
 

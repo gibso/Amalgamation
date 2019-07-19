@@ -88,7 +88,7 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
             cstr = cstr[:-1]
             cstr = cstr + " end\n\n"
 
-    amalgam_tmp_filepath = "/data/casl/amalgam_tmp.casl"
+    amalgam_tmp_filepath = "/data/amalgam_tmp.casl"
     outFile = open(amalgam_tmp_filepath,"w")
     outFile.write(cstr)
     outFile.close()

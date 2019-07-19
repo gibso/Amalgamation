@@ -5,11 +5,7 @@ import hets_helper
 from settings import *
 
 def remove_all_output_files():
-    for output_type in ['th', 'xml', 'casl', 'tp']:
-        remove_output_files(output_type)
-
-def remove_output_files(file_type):
-    fileList = glob.glob(f'/data/{file_type}/*.{file_type}')
+    fileList = glob.glob(f'/data/*')
     for fileName in fileList:
         os.remove(fileName)
 
@@ -29,7 +25,7 @@ print("\n\n\n")
 lpRep = toLP(inputSpaces)
 lpRep = "#program base.\n\n" + lpRep
 generic_file_name = hets_helper.get_generic_filename_for(filename=fName)
-lpFileName =  f'/data/lp/{generic_file_name}.lp'
+lpFileName =  f'/data/{generic_file_name}.lp'
 lpFile = open(lpFileName,'w')
 lpFile.write(lpRep)
 lpFile.close()
