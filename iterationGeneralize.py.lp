@@ -64,7 +64,7 @@ def onModelGeneralize(model):
             
             print('Other blend? (n) ')
             sys.stdout.flush()
-            x = raw_input()
+            x = 'n'
             
             if x == 'n':
                break;
