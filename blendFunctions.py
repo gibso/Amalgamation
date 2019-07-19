@@ -122,7 +122,7 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
             tries = 0
 
             # Try to generate input files several times. This is neccesary due to strange file writing bug. 
-            while True:
+            while False:
 
                 if os.path.isfile(blendTptpName):
                      blendFileSize = os.stat(blendTptpName).st_size
@@ -143,7 +143,9 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
                     print("ERROR: File "+blendTptpName+" not yet written correctly "+ str(tries) + " times! Aborting...")
                     exit(1)
 
-            thisCombiConsistent = checkConsistency(blendTptpName)
+            # thisCombiConsistent = checkConsistency(blendTptpName)
+            # skip tptp generation and consitency checking because tptp file creation with hets is buggy
+            thisCombiConsistent = 1
 
                         
             # if thisCombiConsistent == 1: # If we can show that the blend is consistent
