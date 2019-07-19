@@ -175,7 +175,7 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
                 blends.append(blendInfo)
 
     os.system("rm -rf *.tptp")
-    os.remove("amalgamTmp.casl")
+    os.remove("/data/amalgam_tmp.casl")
     
     return [blends,highestValue]
     
@@ -305,30 +305,18 @@ def generateBlend(blend):
     blendFilesList = ''
     
     blendStr = blend["prettyHetsStr"]
-    fName = blend["blendName"] + "_b_"+str(bNum)+".casl"
+    fName = f'/data/{blend["blendName"]}_b_{str(bNum)}.casl'
     outFile = open(fName,"w")
     outFile.write(blendStr)
     outFile.close()
-    tries = 0
-    while True:
-        ### call HETS API
-        subprocess.call([hetsExe, "-o th", fName])
-        thName = fName[:-5]+"_Blend.th"
-        thFileSize = 0
-        if os.path.isfile(thName):
-            thFileSize = os.stat(thName).st_size
 
-        if tries > 15:
-            print("ERROR: file " + thName + " not yet written in " + str(tries) + " times ! Aborting...")
-            exit(1)                
-        tries = tries + 1            
+    blend_casl_file = open(fName, 'r')
+    th_files = hets_helper.generate_th_files_from(blend_casl_file)
+    blend_node_th_filename = f'/data/{hets_helper.get_generic_filename_for(blend_casl_file)}_Blend.th'
+    blend_node_th_file = list(filter(lambda file: file.name == blend_node_th_filename, th_files))[0]
 
-        if thFileSize != 0:
-            break
-
-    bFile = open(thName,"r")
-    explicitBlendStr = bFile.read()
-    bFile.close()
+    explicitBlendStr = blend_node_th_file.read()
+    blend_node_th_file.close()
     # remove first two lines and rename explicit blend spec
     lineBreakPos = explicitBlendStr.find("\n")
     explicitBlendStr = explicitBlendStr[lineBreakPos+1:]
@@ -354,7 +342,7 @@ def generateBlend(blend):
     bNum = bNum + 1
 
     # raw_input
-    fileListFile = open("blendFiles.txt","w")
+    fileListFile = open("/data/blendFiles.txt","w")
     fileListFile.write(blendFilesList)
     fileListFile.close()
     return explicitBlendStr
@@ -392,9 +380,9 @@ def writeBlends(blends):
             if thFileSize != 0:
                 break
 
-        bFile = open(thName,"r")
-        explicitBlendStr = bFile.read()
-        bFile.close()
+        blend_node_th_file = open(thName,"r")
+        explicitBlendStr = blend_node_th_file.read()
+        blend_node_th_file.close()
         # remove first two lines and rename explicit blend spec
         lineBreakPos = explicitBlendStr.find("\n")
         explicitBlendStr = explicitBlendStr[lineBreakPos+1:]

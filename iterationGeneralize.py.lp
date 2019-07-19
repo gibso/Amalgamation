@@ -57,7 +57,7 @@ def onModelGeneralize(model):
         for blendJson in blendJsonList:
 
             os.system("rm -rf blend.json")
-            outFile = open('blend.json',"w")
+            outFile = open('/data/blend.json',"w")
             outFile.write(json.dumps(blendJson))
             #print(blendJson)
             outFile.close()
