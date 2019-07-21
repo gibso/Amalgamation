@@ -38,7 +38,7 @@ def input2Xml(fName, input_spaces):
     input_spaces_casl_file = open(input_spaces_casl_file.name, "r")
 
     # generate xml file for the new input spaces file
-    xml_file = hets_helper.generate_files_from(input_spaces_casl_file, 'xml')[0]
+    xml_file = hets_helper.generate_xml_file_from(input_spaces_casl_file)
     ET.parse(xml_file.name)
     return xml_file.name
 
