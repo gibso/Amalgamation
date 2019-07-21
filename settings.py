@@ -3,7 +3,7 @@
 ##### The input file should contain the input spaces, i.e. specifications to be blended. The file can also contain other specifications, so that e.g., in CASL, the input spaces can inherit structure from a same parent space. However, a parent space is not necessarily a generic space. Currently, only two input spaces are supported.
 
 inputFile = "examples/minimal.casl"
-inputSpaceNames = ["S1","S2"]
+inputSpaceNames = ["S1", "S2"]
 
 ###### The number of models to be generated (0 for all models)
 numModels = 1
@@ -21,7 +21,6 @@ blendValuePercentageBelowHighestValueToKeep = 0
 eproverTimeLimit = 4
 darwinTimeLimit = 0.1
 
-
 ###### Path to the HETS executable ######
 useHetsAPI = 0
 hetsUrl = 'http://localhost:8000/'
@@ -29,9 +28,6 @@ hetsExe = 'hets'
 
 ###### Switch to enable the explicit generation of blend files (see function writeBlends.py) ######
 genExplicitBlendFiles = True
-
-
-
 
 ###################################################################
 
@@ -43,14 +39,13 @@ genExplicitBlendFiles = True
 ## This is quite slow... 
 # inputFile = "examples/LPNMR/naturalsAndLists_fact.casl"
 inputFile = "examples/LPNMR/naturalsAndLists_fact_minimal.casl"
-inputSpaceNames = ["Nat","List"]
+inputSpaceNames = ["Nat", "List"]
 
 ## This is fast enough, but gives an error with json output...
 # inputFile = "examples/LPNMR/naturalsAndLists_fact.casl"
 inputFile = "examples/maths/naturalsAndLists_sum_minimal.casl"
-inputSpaceNames = ["Nat","List"]
+inputSpaceNames = ["Nat", "List"]
 
 ## This runs fine
 inputFile = "examples/music/tritone_demo.casl"
-inputSpaceNames = ["G7","Bbmin"]
-
+inputSpaceNames = ["G7", "Bbmin"]

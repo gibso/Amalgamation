@@ -8,11 +8,11 @@ import hets_helper
 axMap = {}
 axEqClasses = {}
 
+
 ### input2Xml translates CASL input spaces to an xml file. The xml simplifies the CASL parsing.
 ### Input:  CASL file name and names of input spaces
 ### Output: The path to an xml file representing the input spaces.     
 def input2Xml(fName, input_spaces):
-
     # First generate .th files from CASL files.
     casl_file = open(fName, 'rb')
     th_files = hets_helper.generate_th_files_from(casl_file)
@@ -42,39 +42,46 @@ def input2Xml(fName, input_spaces):
     ET.parse(xml_file.name)
     return xml_file.name
 
-## This class represents a predicate in CASL. 
+
+## This class represents a predicate in CASL.
 class CaslPred:
     def __init__(self, name):
         self.name = name
         self.args = []
         self.priority = 1
-    
+
     @staticmethod
     def byStr(text):
         pName = text[4:].split(":")[0].strip()
         p = CaslPred(pName)
-        p.args = text.split(":")[1].strip().split(" * ")  
+        p.args = text.split(":")[1].strip().split(" * ")
         return p
-        
-    def toCaslStr(self):
-        outStr = "pred " + self.name + " : " 
-        for s in self.args: outStr = outStr + s +" * " 
-        outStr = outStr[:-3]
-        outStr = outStr + "\t%% prio:"+ str(self.priority)
-        return outStr    
 
-    def toLPStr(self, specName) :
-        oStr = "hasPred("+toLPName(specName,"spec")+","+toLPName(self.name,"po")+",0).\n"
+    def toCaslStr(self):
+        outStr = "pred " + self.name + " : "
+        for s in self.args: outStr = outStr + s + " * "
+        outStr = outStr[:-3]
+        outStr = outStr + "\t%% prio:" + str(self.priority)
+        return outStr
+
+    def toLPStr(self, specName):
+        oStr = "hasPred(" + toLPName(specName, "spec") + "," + toLPName(self.name, "po") + ",0).\n"
         argCtr = 1
         for arg in self.args:
-            oStr = oStr + "predHasSort("+toLPName(specName,"spec")+","+toLPName(self.name,"po")+","+toLPName(arg,"sort")+",arg"+str(argCtr)+",0).\n"
-            argCtr = argCtr + 1        
-        # if self. == True:
+            oStr = oStr + "predHasSort(" + toLPName(specName, "spec") + "," + toLPName(self.name,
+                                                                                       "po") + "," + toLPName(arg,
+                                                                                                              "sort") + ",arg" + str(
+                argCtr) + ",0).\n"
+            argCtr = argCtr + 1
+            # if self. == True:
             # oStr = oStr + "removablePred("+toLPName(specName,"spec")+","+toLPName(self.name)+").\n"
-        oStr = oStr + "predHasPriority("+toLPName(specName,"spec")+","+toLPName(self.name,"po")+","+str(self.priority)+").\n"        
-        return oStr 
-             
-## This class represents an operator in CASL.       
+        oStr = oStr + "predHasPriority(" + toLPName(specName, "spec") + "," + toLPName(self.name, "po") + "," + str(
+            self.priority) + ").\n"
+        return oStr
+
+    ## This class represents an operator in CASL.
+
+
 class CaslOp:
     def __init__(self, name):
         self.name = name
@@ -83,7 +90,7 @@ class CaslOp:
         # self.removable = 1
         self.isDataOp = False
         self.priority = 0
-    
+
     @staticmethod
     def byStr(text):
         opName = text[2:].split(":")[0].strip()
@@ -91,53 +98,57 @@ class CaslOp:
         if text.find("->") == -1:
             op.dom = text.split(":")[1].strip()
             op.partial = False
-        else: 
+        else:
             # if the operator is not a partial function (i.e. a total function)
             if text.find("->?") == -1:
-                op.args = text.split(":")[1].split("->")[0].strip().split(" * ")  
+                op.args = text.split(":")[1].split("->")[0].strip().split(" * ")
                 op.dom = text.split("->")[1].strip()
                 op.partial = False
             # if the operator is a partial function
             else:
-                op.args = text.split(":")[1].split("->?")[0].strip().split(" * ")  
+                op.args = text.split(":")[1].split("->?")[0].strip().split(" * ")
                 op.dom = text.split("->?")[1].strip()
                 op.partial = True
         return op
-    
+
     def toCaslStr(self):
-        outStr = "op " + self.name + " : " 
-        for s in self.args: outStr = outStr + s +" * " 
+        outStr = "op " + self.name + " : "
+        for s in self.args: outStr = outStr + s + " * "
         outStr = outStr[:-3]
         if self.partial == False:
             arrStr = " -> "
         else:
             arrStr = " ->? "
         if len(self.args) > 0:
-            outStr = outStr + arrStr +self.dom    
+            outStr = outStr + arrStr + self.dom
         else:
-            outStr = outStr + " : " +self.dom
+            outStr = outStr + " : " + self.dom
 
-        outStr = outStr + "\t%%prio:"+ str(self.priority)
+        outStr = outStr + "\t%%prio:" + str(self.priority)
         if self.isDataOp:
-            outStr +=  "\t(data operator)"
-        return outStr 
+            outStr += "\t(data operator)"
+        return outStr
 
-    def toLPStr(self,specName):
-        oStr = "hasOp("+toLPName(specName,"spec")+","+toLPName(self.name,"po")+",0).\n"
+    def toLPStr(self, specName):
+        oStr = "hasOp(" + toLPName(specName, "spec") + "," + toLPName(self.name, "po") + ",0).\n"
         argCtr = 1
         for arg in self.args:
-            oStr = oStr + "opHasSort("+toLPName(specName,"spec")+","+toLPName(self.name,"po")+","+toLPName(arg,"sort")+",arg"+str(argCtr)+",0).\n"
+            oStr = oStr + "opHasSort(" + toLPName(specName, "spec") + "," + toLPName(self.name, "po") + "," + toLPName(
+                arg, "sort") + ",arg" + str(argCtr) + ",0).\n"
             argCtr = argCtr + 1
-        oStr = oStr + "opHasSort("+toLPName(specName,"spec")+","+toLPName(self.name,"po")+","+toLPName(self.dom,"sort")+",domain,0).\n"
+        oStr = oStr + "opHasSort(" + toLPName(specName, "spec") + "," + toLPName(self.name, "po") + "," + toLPName(
+            self.dom, "sort") + ",domain,0).\n"
         if self.isDataOp == False:
-            oStr = oStr + "isNonDataOp("+toLPName(specName,"spec")+","+toLPName(self.name,"po")+").\n"
+            oStr = oStr + "isNonDataOp(" + toLPName(specName, "spec") + "," + toLPName(self.name, "po") + ").\n"
         else:
-            oStr = oStr + "isDataOp("+toLPName(specName,"spec")+","+toLPName(self.name,"po")+").\n"
-        oStr = oStr + "opHasPriority("+toLPName(specName,"spec")+","+toLPName(self.name,"po")+","+str(self.priority)+").\n"        
-        return oStr 
+            oStr = oStr + "isDataOp(" + toLPName(specName, "spec") + "," + toLPName(self.name, "po") + ").\n"
+        oStr = oStr + "opHasPriority(" + toLPName(specName, "spec") + "," + toLPName(self.name, "po") + "," + str(
+            self.priority) + ").\n"
+        return oStr
 
-    
-## This class represents a sort in CASL.       
+    ## This class represents a sort in CASL.
+
+
 class CaslSort:
     def __init__(self, name):
         self.name = name
@@ -150,23 +161,27 @@ class CaslSort:
         outStr = "sort " + self.name
         if self.parent != "":
             outStr = outStr + " < " + self.parent
-        outStr = outStr + "\t%%prio:"+ str(self.priority)
+        outStr = outStr + "\t%%prio:" + str(self.priority)
         if self.isDataSort:
-            outStr +=  "\t(data sort)"
+            outStr += "\t(data sort)"
         return outStr
 
-    def toLPStr(self,specName):
-        oStr = "hasSort("+toLPName(specName,"spec")+","+toLPName(self.name,"sort")+",0).\n"
+    def toLPStr(self, specName):
+        oStr = "hasSort(" + toLPName(specName, "spec") + "," + toLPName(self.name, "sort") + ",0).\n"
         if self.parent != "":
-            oStr = oStr + "hasParentSort("+toLPName(specName,"spec")+","+toLPName(self.name,"sort")+","+toLPName(self.parent,"sort")+",0).\n"
+            oStr = oStr + "hasParentSort(" + toLPName(specName, "spec") + "," + toLPName(self.name,
+                                                                                         "sort") + "," + toLPName(
+                self.parent, "sort") + ",0).\n"
         if self.isDataSort == False:
-            oStr = oStr + "isNonDataSort("+toLPName(specName,"spec")+","+toLPName(self.name,"sort")+").\n"
+            oStr = oStr + "isNonDataSort(" + toLPName(specName, "spec") + "," + toLPName(self.name, "sort") + ").\n"
         else:
-            oStr = oStr + "isDataSort("+toLPName(specName,"spec")+","+toLPName(self.name,"sort")+").\n"
-        oStr = oStr + "sortHasPriority("+toLPName(specName,"spec")+","+toLPName(self.name,"sort")+","+str(self.priority)+").\n"
+            oStr = oStr + "isDataSort(" + toLPName(specName, "spec") + "," + toLPName(self.name, "sort") + ").\n"
+        oStr = oStr + "sortHasPriority(" + toLPName(specName, "spec") + "," + toLPName(self.name, "sort") + "," + str(
+            self.priority) + ").\n"
         return oStr
 
-# This class represents a CASL specification.        
+
+# This class represents a CASL specification.
 class CaslSpec:
     def __init__(self, name):
         self.name = name
@@ -175,46 +190,47 @@ class CaslSpec:
         self.sorts = []
         self.axioms = []
         self.id = 0
-        self.totalSteps = 0       # This is the total number of parrallel generalisations applied on all input specifications so far. 
+        self.totalSteps = 0  # This is the total number of parrallel generalisations applied on all input specifications so far.
         # self.thisStep = 0       # This is the number of generalisation opertions applied on only this spec so far. 
-        self.genCost = 0    # this representd the amount of information that is removed from an input specification. It is currently not needed, but we might want to use it in the future. 
-        self.infoValue = 0 # This is the amount of information left in a specification
-        self.compressionValue = 0 # This is the amount of information that was `merged' between two input spaces by renaming operators, sorts and predicates. 
+        self.genCost = 0  # this representd the amount of information that is removed from an input specification. It is currently not needed, but we might want to use it in the future.
+        self.infoValue = 0  # This is the amount of information left in a specification
+        self.compressionValue = 0  # This is the amount of information that was `merged' between two input spaces by renaming operators, sorts and predicates.
 
     def toCaslStr(self):
         # caslStr = "CaslSpec:\n"
         caslStr = "spec "
-        caslStr = caslStr +  self.name +" = %% InfoValue: " + str(self.infoValue) + " -- CompressionValue: " + str(self.compressionValue) + "\n"
-        for s in self.sorts: 
+        caslStr = caslStr + self.name + " = %% InfoValue: " + str(self.infoValue) + " -- CompressionValue: " + str(
+            self.compressionValue) + "\n"
+        for s in self.sorts:
             if s.name == "PriorityDummySort":
                 continue
             caslStr = caslStr + "\t " + s.toCaslStr() + "\n"
         # if len(self.ops) > 0 :
-            # caslStr = caslStr + "\t ops \n" 
-        for op in self.ops: 
+        # caslStr = caslStr + "\t ops \n"
+        for op in self.ops:
             if op.name == "prioDummyOp":
                 continue
-            caslStr = caslStr + "\t " + op.toCaslStr() +"\n"
+            caslStr = caslStr + "\t " + op.toCaslStr() + "\n"
         # if len(self.preds) > 0 :
-            # caslStr = caslStr + "\t preds \n"
-        for p in self.preds: 
-            caslStr = caslStr + "\t " + p.toCaslStr() +"\n"
+        # caslStr = caslStr + "\t preds \n"
+        for p in self.preds:
+            caslStr = caslStr + "\t " + p.toCaslStr() + "\n"
         caslStr += "\n"
-        for ax in self.axioms: 
+        for ax in self.axioms:
             if ax.axStr == ". prioDummyOp = prioDummyOp":
                 continue
             caslStr = caslStr + ax.toCaslStr()
         caslStr = caslStr + "end"
-        
+
         return caslStr
-        
+
     def toLP(self):
         global lpToCaslMapping
-        oStr  = "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
-        oStr += "%% spec " + self.name+" %%\n"
+        oStr = "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
+        oStr += "%% spec " + self.name + " %%\n"
         oStr += "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n"
-        oStr = oStr + "spec("+toLPName(self.name,"spec")+").\n"
-        oStr = oStr + "hasId("+toLPName(self.name,"spec")+","+str(self.id)+").\n\n"      
+        oStr = oStr + "spec(" + toLPName(self.name, "spec") + ").\n"
+        oStr = oStr + "hasId(" + toLPName(self.name, "spec") + "," + str(self.id) + ").\n\n"
         oStr += "%% sorts %%\n"
         for so in self.sorts:
             if so.name == "PriorityDummySort":
@@ -236,11 +252,12 @@ class CaslSpec:
                 continue
             if ax.priority == -1:
                 continue
-            oStr = oStr + ax.toLPStr(self.name) + "\n"        
+            oStr = oStr + ax.toLPStr(self.name) + "\n"
 
-        # print("opToCaslMap:")
+            # print("opToCaslMap:")
         # print(lpToCaslMapping)
         return oStr
+
     def setInfoValue(self):
         self.infoValue = 0
         for sort in self.sorts:
@@ -258,17 +275,18 @@ class CaslSpec:
         # print("Preds Set info value to " + str(self.infoValue))
         for ax in self.axioms:
             if ax.priority > 0:
-                self.infoValue = ax.priority  + self.infoValue
+                self.infoValue = ax.priority + self.infoValue
         # print("Ax Set info value to " + str(self.infoValue))
         # raw_input()
 
-class CaslAx:    
+
+class CaslAx:
 
     def __init__(self, id, name, axStr):
         self.id = id
         self.name = name
         self.axStr = axStr
-        self.isDataAxiom = False # THis determines whether only data operators (generated type constants) are part of this axiom. Typicallay, such axioms denote, e.g., that natural numbers are not equal, that the boolean true is not equal to false, or that the tones of a chord (which are data operators) are not equal. 
+        self.isDataAxiom = False  # THis determines whether only data operators (generated type constants) are part of this axiom. Typicallay, such axioms denote, e.g., that natural numbers are not equal, that the boolean true is not equal to false, or that the tones of a chord (which are data operators) are not equal.
         self.priority = 1
         self.eqClass = getEquivalenceClass(axStr)
         self.involvedPredsOps = {}
@@ -277,30 +295,35 @@ class CaslAx:
 
     def getCaslAnnotationStr(self):
         aStr = ''
-        aStr += "\t%("+self.name+")%\t%priority(" + str(self.priority) + ")%\t %%id:"+str(self.id) + "\teqClass: "+str(self.eqClass)
+        aStr += "\t%(" + self.name + ")%\t%priority(" + str(self.priority) + ")%\t %%id:" + str(
+            self.id) + "\teqClass: " + str(self.eqClass)
         if self.isDataAxiom:
             aStr += "\t(data axiom)"
-        return  aStr
+        return aStr
 
-    def toCaslStr(self):        
+    def toCaslStr(self):
         return "\t" + self.axStr + self.getCaslAnnotationStr() + "\n"
-        
+
     def toLPStr(self, specName):
         if self.axStr.find("generated type") != -1:
             return ""
         oStr = "\n%% Axiom " + self.name + " %%\n"
-        oStr += "hasAxiom("+toLPName(specName,"spec")+","+str(self.id)+",0).\n"
-        oStr += "axHasEquivalenceClass("+toLPName(specName,"spec")+","+str(self.id)+","+str(self.eqClass)+",0).\n"
+        oStr += "hasAxiom(" + toLPName(specName, "spec") + "," + str(self.id) + ",0).\n"
+        oStr += "axHasEquivalenceClass(" + toLPName(specName, "spec") + "," + str(self.id) + "," + str(
+            self.eqClass) + ",0).\n"
         if self.isDataAxiom == False:
-            oStr = oStr + "isNonDataAx("+toLPName(specName,"spec") +","+str(self.id)+").\n"
+            oStr = oStr + "isNonDataAx(" + toLPName(specName, "spec") + "," + str(self.id) + ").\n"
         else:
-            oStr = oStr + "isDataAx("+toLPName(specName,"spec") +","+str(self.id)+").\n"
-        oStr = oStr + "axHasPriority("+toLPName(specName,"spec") +","+str(self.id)+","+str(self.priority)+").\n"
-        
+            oStr = oStr + "isDataAx(" + toLPName(specName, "spec") + "," + str(self.id) + ").\n"
+        oStr = oStr + "axHasPriority(" + toLPName(specName, "spec") + "," + str(self.id) + "," + str(
+            self.priority) + ").\n"
+
         for po in self.involvedPredsOps:
-            oStr += "axInvolvesPredOp("+toLPName(specName,"spec") +","+str(self.id)+","+toLPName(po,"po")+",0).\n"
+            oStr += "axInvolvesPredOp(" + toLPName(specName, "spec") + "," + str(self.id) + "," + toLPName(po,
+                                                                                                           "po") + ",0).\n"
         for s in self.involvedSorts:
-            oStr += "axInvolvesSort("+toLPName(specName,"spec") +","+str(self.id)+","+toLPName(s,"sort")+",0).\n"
+            oStr += "axInvolvesSort(" + toLPName(specName, "spec") + "," + str(self.id) + "," + toLPName(s,
+                                                                                                         "sort") + ",0).\n"
 
         return oStr
 
@@ -308,10 +331,10 @@ class CaslAx:
     def fromAxStr(self, text):
         if text.find("generated type") != -1:
             return True
-      
+
         # first extract quantifications
         axStr = copy.deepcopy(text)
-        
+
         # print("parsing axiom")
         # print(axStr)
 
@@ -324,11 +347,11 @@ class CaslAx:
         # Identify sorts in axiom
 
         while True:
-            match = re.search(pattern,tmpAxStr)
+            match = re.search(pattern, tmpAxStr)
             if match == None:
                 break
             # print(match.group(0))
-            tmpAxStr = re.sub(pattern,"",tmpAxStr,count=1)
+            tmpAxStr = re.sub(pattern, "", tmpAxStr, count=1)
             self.involvedSorts[match.group(0)[3:]] = True
 
         # print(self.involvedSorts.keys())
@@ -337,20 +360,20 @@ class CaslAx:
 
         tmpAxStr = copy.deepcopy(axStr)
         pattern = "(forall|exists|exists!).*?[\.]"
-        vars = set()        
+        vars = set()
         while True:
-            match = re.search(pattern,tmpAxStr)
+            match = re.search(pattern, tmpAxStr)
             if match == None:
                 break
             # print("varMatch")
             # print(match.group(0))
-            varArr = re.split("[\s.=(),:><;\n\\\\/]|not|forall|exists|exists!|",match.group(0))
+            varArr = re.split("[\s.=(),:><;\n\\\\/]|not|forall|exists|exists!|", match.group(0))
             varArr = list(set(varArr) - set(self.involvedSorts.keys()))
             vars = vars | set(varArr)
-            tmpAxStr = re.sub(pattern,"",tmpAxStr,count=1)
+            tmpAxStr = re.sub(pattern, "", tmpAxStr, count=1)
 
         # Identify operatos and predictes in axiom.
-        axStrArr = re.split("[ .=(),:><;\n\\\\/]|not|forall|exists|exists!|",tmpAxStr)
+        axStrArr = re.split("[ .=(),:><;\n\\\\/]|not|forall|exists|exists!|", tmpAxStr)
         predOpNames = {}
         for item in axStrArr:
             if item == "":
@@ -371,8 +394,8 @@ def parseXml(xmlFile):
     tree = ET.parse(xmlFile)
     # print("End calling parseXml method")
     dGraph = tree.getroot()
-    ctr = 0  
-    axCtr = 0 
+    ctr = 0
+    axCtr = 0
     dataOps = {}
     dataSorts = {}
     opAndSortPriorities = {}
@@ -384,15 +407,14 @@ def parseXml(xmlFile):
         thisSpec = CaslSpec(specName)
         thisSpec.id = len(specs)
         # print("found spec " + specName)
-        
 
         # First scan axioms to get the following meta-information:
         # (i) data ops, and sorts. Data ops and sorts are those in generated type definitions, so we have to scan for axioms starting with the string "generated type".
         # (ii) Priority information of ops, predicates and sorts. Priorities are encoded in the name of dummy-axioms that have the string ". prioDummyOp = prioDummyOp".
         dataOps[specName] = []
         dataSorts[specName] = []
-        opAndSortPriorities[specName]= {}
-        for decAx in dgNode:            
+        opAndSortPriorities[specName] = {}
+        for decAx in dgNode:
             for entry in decAx:
                 if entry.tag == "Axiom":
                     for subEntry in entry:
@@ -401,7 +423,7 @@ def parseXml(xmlFile):
                             if axText.find("generated type") == 0:
                                 dataOpsStr = axText.split("::=")[1]
                                 dataOpStrs = dataOpsStr.split("|")
-                                for op in dataOpStrs : dataOps[specName].append(op.strip())
+                                for op in dataOpStrs: dataOps[specName].append(op.strip())
 
                                 dataSortStr = axText.split("::=")[0][len("generated type"):].strip()
                                 dataSorts[specName].append(dataSortStr)
@@ -410,12 +432,12 @@ def parseXml(xmlFile):
                                 prioInfo = entry.attrib['name'].split("--")
                                 for prioInfoItem in prioInfo:
                                     if len(prioInfoItem.split(":p:")) != 2:
-                                        print("WARNING!!! priority information " + prioInfoItem + " in wrong format. Expecting <ElementName>:p:<priorityNumber>. Assigning priority 0 instead.")
+                                        print(
+                                            "WARNING!!! priority information " + prioInfoItem + " in wrong format. Expecting <ElementName>:p:<priorityNumber>. Assigning priority 0 instead.")
                                     # prioInfoItem is a strings of the form <ElementName>_<PriorityNumber>
                                     thisPrioNumber = int(prioInfoItem.split(":p:")[1])
                                     thisPrioElementName = prioInfoItem.split(":p:")[0]
                                     opAndSortPriorities[specName][thisPrioElementName] = thisPrioNumber
-
 
         # Now that data ops and sorts are determined we can parse for sorts, operators and predictates
         for decAx in dgNode:
@@ -433,7 +455,7 @@ def parseXml(xmlFile):
                             sort.priority = opAndSortPriorities[specName][sName]
                         else:
                             sort.priority = 1
-                        
+
                         if sName in dataSorts[specName]:
                             sort.isDataSort = True
                             sort.priority = 0
@@ -453,7 +475,7 @@ def parseXml(xmlFile):
                                 break
                         if sortExists == False:
                             thisSpec.sorts.append(sort)
-                        
+
                     if entry.attrib['kind'] == 'op':
                         op = CaslOp.byStr(entry.text)
                         # print("op")
@@ -473,36 +495,35 @@ def parseXml(xmlFile):
                         if op.name == "prioDummyOp":
                             op.priority = 0
 
-                        
                         thisSpec.ops.append(op)
-                        
+
                     if entry.attrib['kind'] == 'pred':
                         pred = CaslPred.byStr(entry.text)
                         if pred.name in opAndSortPriorities[specName].keys():
                             pred.priority = opAndSortPriorities[specName][pred.name]
                         else:
                             pred.priority = 1
-                        thisSpec.preds.append(pred)   
-        # Add axioms
+                        thisSpec.preds.append(pred)
+                        # Add axioms
         for decAx in dgNode:
-            for entry in decAx:                
+            for entry in decAx:
                 if entry.tag == "Axiom":
-                    
+
                     name = ''
                     if 'name' in entry.attrib.keys():
                         name = entry.attrib['name']
-                                        
+
                     for subEntry in entry:
                         if subEntry.tag == "Text":
                             axStr = subEntry.text
                             if axStr == '':
                                 continue
-                            ax = CaslAx(axCtr,name,axStr)
-                            
+                            ax = CaslAx(axCtr, name, axStr)
+
                             # Check priority:
                             priority = 1
                             if name.find(":p:") != -1 and name.find("--") == -1:
-                                priority = int(name.split(":p:")[1].split(":")[0])                        
+                                priority = int(name.split(":p:")[1].split(":")[0])
                             if 'priority' in entry.attrib.keys():
                                 priority = int(entry.attrib['priority'])
                             ax.priority = priority
@@ -525,17 +546,19 @@ def parseXml(xmlFile):
         thisSpec.setInfoValue()
         specs.append(copy.deepcopy(thisSpec))
     return specs
-    
+
+
 # Turn CASL specs in their internal data structure into a Logic Programming specification that is compatible with the ASP files. 
 def toLP(caslSpecs):
     lpStr = ""
     for s in caslSpecs:
         lpStr = lpStr + s.toLP()
         lpStr += "\n\n\n"
-    
+
     return lpStr
-    
-def getActFromAtom(a):    
+
+
+def getActFromAtom(a):
     # print(a)
     if a[:4] != "exec":
         print("Error, this is not an action atom.")
@@ -543,12 +566,12 @@ def getActFromAtom(a):
     actStr = a[5:-1]
     act = {}
     actStrArr = actStr.split(",")
-    act["step"] = int(actStrArr[len(actStrArr)-1])
-    act["iSpace"] = actStrArr[len(actStrArr)-2]
+    act["step"] = int(actStrArr[len(actStrArr) - 1])
+    act["iSpace"] = actStrArr[len(actStrArr) - 2]
     atomicActStr = ""
     # re-assemble first parts of this string to obtain the atomic generalization action string.
     for item in actStrArr:
-        if item == actStrArr[len(actStrArr)-2]:
+        if item == actStrArr[len(actStrArr) - 2]:
             break
         atomicActStr = atomicActStr + item + ","
     atomicActStr = atomicActStr[:-1]
@@ -557,16 +580,15 @@ def getActFromAtom(a):
     act["argVect"] = atomicActStr.split("(")[1][:-1].split(",")
     return act
 
-def getGeneralizedSpaces(atoms, originalInputSpaces):
 
+def getGeneralizedSpaces(atoms, originalInputSpaces):
     inputSpaces = copy.deepcopy(originalInputSpaces)
     generalizations = {}
     lastSpecName = ''
-    
+
     for spec in originalInputSpaces:
         generalizations[spec.name] = [spec]
         lastSpecName = spec.name
-
 
     # modify CASL data according to Answer Set atoms.
     acts = {}
@@ -578,31 +600,31 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
                 acts[act["step"]] = {}
             if act["iSpace"] not in acts[act["step"]].keys():
                 acts[act["step"]][act["iSpace"]] = []
-            
+
             acts[act["step"]][act["iSpace"]].append(act)
 
     for step in sorted(acts.keys()):
         for iSpace in sorted(acts[step]):
             for cSpec in inputSpaces:
                 # remove operators, predicates and axioms
-                if toLPName(cSpec.name,"spec") == iSpace:  
+                if toLPName(cSpec.name, "spec") == iSpace:
                     newCompressionValue = 0
                     infoValue = 0
                     genCost = 0
                     for act in acts[step][iSpace]:
                         # print(act)
-                        if act["actType"] == "rmOp" :
+                        if act["actType"] == "rmOp":
                             for op in cSpec.ops:
-                                if toLPName(op.name,"po") == act["argVect"][0]:
+                                if toLPName(op.name, "po") == act["argVect"][0]:
                                     cSpec.ops.remove(op)
                                     # genCost += op.priority
                                     break
 
-                        if act["actType"] == "renameOp" :
+                        if act["actType"] == "renameOp":
                             opFrom = act["argVect"][0]
                             opTo = act["argVect"][1]
                             for op in cSpec.ops:
-                                if toLPName(op.name,"po") == opFrom:
+                                if toLPName(op.name, "po") == opFrom:
                                     cSpec.ops.remove(op)
 
                                     newOp = copy.deepcopy(op)
@@ -612,8 +634,8 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
                                     # cSpec.compressionValue = cSpec.compressionValue + op.priority
                                     # Also add priority of operator to which we rename to compression value
                                     specToName = lpToCaslStr(act["argVect"][2])
-                                    for specTo in originalInputSpaces:                                     
-                                        if specTo.name == specToName:  
+                                    for specTo in originalInputSpaces:
+                                        if specTo.name == specToName:
                                             for tmpOpTo in specTo.ops:
                                                 if tmpOpTo.name == lpToCaslStr(opTo):
                                                     newCompressionValue += tmpOpTo.priority
@@ -623,29 +645,30 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
                                     break
                             # Get axioms that involve the operator and rename the operator them. 
                             for ax in cSpec.axioms:
-                                newAxStr = re.sub("(?<!\w)"+lpToCaslStr(opFrom)+"(?!\w)", lpToCaslStr(opTo), ax.axStr)
+                                newAxStr = re.sub("(?<!\w)" + lpToCaslStr(opFrom) + "(?!\w)", lpToCaslStr(opTo),
+                                                  ax.axStr)
                                 ax.axStr = newAxStr
-                        
+
                         # if act["actType"] == "renamedToOp" :
-                            # opLPName = act["argVect"][0]
-                            # for op in cSpec.ops:
-                            #     if toLPName(op.name,"po") == opLPName:
-                            #         cSpec.compressionValue = cSpec.compressionValue + op.priority
-                            #         break
-                            
-                        if act["actType"] == "rmPred" :
+                        # opLPName = act["argVect"][0]
+                        # for op in cSpec.ops:
+                        #     if toLPName(op.name,"po") == opLPName:
+                        #         cSpec.compressionValue = cSpec.compressionValue + op.priority
+                        #         break
+
+                        if act["actType"] == "rmPred":
                             for p in cSpec.preds:
-                                if toLPName(p.name,"po") == act["argVect"][0]:
+                                if toLPName(p.name, "po") == act["argVect"][0]:
                                     cSpec.preds.remove(p)
                                     # cSpec.genCost = cSpec.genCost + p.priority
                                     break
 
-                        if act["actType"] == "renamePred" :
+                        if act["actType"] == "renamePred":
                             pFrom = act["argVect"][0]
                             pTo = act["argVect"][1]
                             for p in cSpec.preds:
-                                if toLPName(p.name,"po") == pFrom:
-                                    cSpec.preds.remove(p)                                    
+                                if toLPName(p.name, "po") == pFrom:
+                                    cSpec.preds.remove(p)
                                     newPred = copy.deepcopy(p)
                                     newPred.name = lpToCaslStr(pTo)
                                     cSpec.preds.append(newPred)
@@ -653,8 +676,8 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
                                     newCompressionValue += p.priority
                                     # Also add priority of predicate to which we rename to compression value
                                     specToName = lpToCaslStr(act["argVect"][2])
-                                    for specTo in originalInputSpaces:                                        
-                                        if specTo.name == specToName:                                              
+                                    for specTo in originalInputSpaces:
+                                        if specTo.name == specToName:
                                             for tmpPredTo in specTo.preds:
                                                 if tmpPredTo.name == lpToCaslStr(pTo):
                                                     # cSpec.compressionValue = cSpec.compressionValue + tmpPredTo.priority
@@ -665,46 +688,46 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
                             # Get axioms that involve the predicate and rename the predicate them. 
                             for ax in cSpec.axioms:
                                 # if p.name in ax.determinePredsOpsSorts():
-                                    # Add new updated axioms with changed operator names
-                                newAxStr = re.sub("(?<!\w)"+lpToCaslStr(pFrom)+"(?!\w)", lpToCaslStr(pTo), ax.axStr)
+                                # Add new updated axioms with changed operator names
+                                newAxStr = re.sub("(?<!\w)" + lpToCaslStr(pFrom) + "(?!\w)", lpToCaslStr(pTo), ax.axStr)
                                 ax.axStr = newAxStr
                                 # ax.id = axMap[newAxStr]
-                            
+
                             # print("renaming predicate from " + lpToCaslStr(pFrom) + " to " + lpToCaslStr(pTo) + ". Press key...")
                             # print(cSpec.toCaslStr())
                             # raw_input()
 
                         # if act["actType"] == "renamedToPred" :
-                            # pLPName = act["argVect"][0]
-                            # for p in cSpec.preds:
-                            #     if toLPName(p.name,"po") == pLPName:
-                            #         cSpec.compressionValue = cSpec.compressionValue + p.priority
-                            #         break                                        
+                        # pLPName = act["argVect"][0]
+                        # for p in cSpec.preds:
+                        #     if toLPName(p.name,"po") == pLPName:
+                        #         cSpec.compressionValue = cSpec.compressionValue + p.priority
+                        #         break
 
-                        if act["actType"] == "rmSort" :
+                        if act["actType"] == "rmSort":
                             for srt in cSpec.sorts:
-                                if toLPName(srt.name,"sort") == act["argVect"][0]:
+                                if toLPName(srt.name, "sort") == act["argVect"][0]:
                                     cSpec.sorts.remove(srt)
                                     # cSpec.genCost = cSpec.genCost + srt.priority
                                     break
 
-                        if act["actType"] == "renameSort" :
+                        if act["actType"] == "renameSort":
                             sFrom = act["argVect"][0]
                             sTo = act["argVect"][1]
                             print("renaming sort " + sFrom + " to " + sTo)
                             for s in cSpec.sorts:
-                                if toLPName(s.name,"sort") == sFrom:
+                                if toLPName(s.name, "sort") == sFrom:
                                     cSpec.sorts.remove(s)
                                     newSort = copy.deepcopy(s)
                                     newSort.name = lpToCaslStr(sTo)
                                     cSpec.sorts.append(newSort)
-                                    
+
                                     newCompressionValue += s.priority
-                                    
+
                                     # Also add priority of sort to which we rename to compression value
                                     specToName = lpToCaslStr(act["argVect"][2])
-                                    for specTo in originalInputSpaces:                               
-                                        if specTo.name == specToName:                                              
+                                    for specTo in originalInputSpaces:
+                                        if specTo.name == specToName:
                                             for tmpSortTo in specTo.sorts:
                                                 if tmpSortTo.name == lpToCaslStr(sTo):
                                                     # cSpec.compressionValue = cSpec.compressionValue + tmpSortTo.priority
@@ -714,17 +737,15 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
 
                                     break
 
-
                             # change parent sorts of other sorts in this spec. (TODO: Is this necessary??)
                             for s in cSpec.sorts:
-                                if toLPName(s.parent,"sort") == sFrom:
+                                if toLPName(s.parent, "sort") == sFrom:
                                     s.parent = lpToCaslStr(sTo)
                                     break
-                            
 
                             # Get axioms that involve the sort and rename the sorts
                             for ax in cSpec.axioms:
-                                newAxStr = re.sub("(?<!\w)"+lpToCaslStr(sFrom)+"(?!\w)", lpToCaslStr(sTo), ax.axStr)
+                                newAxStr = re.sub("(?<!\w)" + lpToCaslStr(sFrom) + "(?!\w)", lpToCaslStr(sTo), ax.axStr)
                                 ax.axStr = newAxStr
 
                             # change sorts in operators
@@ -732,26 +753,25 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
                                 # change domain sort. 
                                 if op.dom == lpToCaslStr(sFrom):
                                     op.dom = newSort.name
-                                for n,opSort in enumerate(op.args):
+                                for n, opSort in enumerate(op.args):
                                     if opSort == lpToCaslStr(sFrom):
                                         op.args[n] = newSort.name
 
                             # change sorts in predicates
                             for p in cSpec.preds:
                                 # change domain sort. 
-                                for n,pSort in enumerate(p.args):
+                                for n, pSort in enumerate(p.args):
                                     if pSort == lpToCaslStr(sFrom):
                                         p.args[n] = newSort.name
- 
+
                         # if act["actType"] == "renamedToSort" :
-                            # srtLPName = act["argVect"][0]
-                            # for srt in cSpec.sorts:
-                            #     if toLPName(srt.name,"sort") == srtLPName:
-                            #         cSpec.compressionValue = cSpec.compressionValue + srt.priority
-                            #         break          
+                        # srtLPName = act["argVect"][0]
+                        # for srt in cSpec.sorts:
+                        #     if toLPName(srt.name,"sort") == srtLPName:
+                        #         cSpec.compressionValue = cSpec.compressionValue + srt.priority
+                        #         break
 
-
-                        if act["actType"] == "rmAx" :
+                        if act["actType"] == "rmAx":
                             for a in cSpec.axioms:
                                 if str(a.id) == act["argVect"][0]:
                                     cSpec.axioms.remove(a)
@@ -768,9 +788,9 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
                     # raw_input()
 
     # add one last generic cSpec
-    genSpec = copy.deepcopy(generalizations[lastSpecName][len(generalizations[lastSpecName])-1])
+    genSpec = copy.deepcopy(generalizations[lastSpecName][len(generalizations[lastSpecName]) - 1])
     genSpec.name = "Generic"
-    generalizations["Generic"] = [genSpec]    
+    generalizations["Generic"] = [genSpec]
 
     # Compute generalisation values for all specs. 
 
@@ -778,25 +798,26 @@ def getGeneralizedSpaces(atoms, originalInputSpaces):
     for specList in generalizations.values():
         for spec in specList:
             spec.setInfoValue()
-             
+
             print(spec.toCaslStr())
     # sys.exit(1)
 
     return generalizations
 
-# This function works, but it should be more sophisticated and use logical equivalence instead of syntactic equality to check if axioms are equal. 
-def getNewAxIdOpRename(axId,op1,op2):
+
+# This function works, but it should be more sophisticated and use logical equivalence instead of syntactic equality to check if axioms are equal.
+def getNewAxIdOpRename(axId, op1, op2):
     axInt = int(str(axId))
     op1Str = str(op1)
     op2Str = str(op2)
     global axMap
     # print("Assigning new axiom Id after renaming " + str(op1Str) + " to " + str(op2Str))
     # TODO: This is probably very slow. I have to find another data type that allows of 1-1 mappings with hashing. 
-    reverseAxMap = {value:key for key, value in axMap.iteritems()}
+    reverseAxMap = {value: key for key, value in axMap.iteritems()}
     # get original axiom string
     axStr = reverseAxMap[axInt]
     # Now apply renaming operations. Replace ech occurrence of op1, that is not surrounded by alphanumerical symbols a-zA-Z0-9 (encoded as \w in regex), with op2
-    newAxStr = re.sub("(?<!\w)"+op1Str+"(?!\w)", op2Str, axStr)
+    newAxStr = re.sub("(?<!\w)" + op1Str + "(?!\w)", op2Str, axStr)
     # print("Replaced " + axStr + " with " + newAxStr)
     # sys.exit(0)
     # now add new string to global axiom dictionary if it does not exist already.
@@ -809,16 +830,17 @@ def getNewAxIdOpRename(axId,op1,op2):
             print("WARNING!! This should not happen. In function: getAxIdOpRename, in langCasl.py")
             sys.exit(0)
         else:
-            axId = max(axMap.values())+1
+            axId = max(axMap.values()) + 1
         # print("New ax does not exist. ID: " + str(axId))
         axMap[newAxStr] = axId
     return axId
+
 
 def getEquivalenceClass(axStr):
     global axEqClasses
 
     for eqClassId in axEqClasses.keys():
-        if isEquivalent(axStr,axEqClasses[eqClassId]):
+        if isEquivalent(axStr, axEqClasses[eqClassId]):
             return eqClassId
 
     newEqClassId = len(axEqClasses)
@@ -826,15 +848,15 @@ def getEquivalenceClass(axStr):
     return newEqClassId
 
 
-def renameEleAndGetNewEqClass(eqClassId,element,eleFrom,eleTo):
+def renameEleAndGetNewEqClass(eqClassId, element, eleFrom, eleTo):
     global axEqClasses
 
     axStr = axEqClasses[eqClassId.number]
     # print("renaming " + str(eleFrom) + " to " + str(eleTo) + " in axiom " + str(axStr))
-    newAxStr = re.sub("(?<!\w)"+lpToCaslStr(str(eleFrom))+"(?!\w)",lpToCaslStr(str(eleTo)),axStr)
+    newAxStr = re.sub("(?<!\w)" + lpToCaslStr(str(eleFrom)) + "(?!\w)", lpToCaslStr(str(eleTo)), axStr)
     # print(" result " + newAxStr)
     return getEquivalenceClass(newAxStr)
 
-def isEquivalent(axStr1,axStr2):
-    return axStr1 == axStr2
 
+def isEquivalent(axStr1, axStr2):
+    return axStr1 == axStr2

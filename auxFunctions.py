@@ -1,23 +1,26 @@
 import math
 import os, sys, time, subprocess, threading, shlex
-def toLPName(caslName,elemType):
 
-    # This is just a dirty quickfix to use (infix) plus and minus operators. 
+
+def toLPName(caslName, elemType):
+    # This is just a dirty quickfix to use (infix) plus and minus operators.
     if caslName == "__+__" or caslName == "+":
-       caslName =  "plus"
+        caslName = "plus"
     if caslName == "__-__" or caslName == "-":
         caslName = "minus"
 
-    caslName = elemType + "_"+caslName
+    caslName = elemType + "_" + caslName
 
     return caslName
+
 
 def lpToCaslStr(lpName):
     uScorePos = lpName.find("_")
     if uScorePos == -1:
         print("Error, lpname invalid")
         exit(1)
-    return lpName[uScorePos+1:]
+    return lpName[uScorePos + 1:]
+
 
 class Command(object):
     """
@@ -38,6 +41,7 @@ class Command(object):
 
     def run(self, timeout=None, **kwargs):
         """ Run a command then return: (status, output, error). """
+
         def target(**kwargs):
             try:
                 self.process = subprocess.Popen(self.command, **kwargs)
@@ -47,6 +51,7 @@ class Command(object):
             except:
                 self.error = traceback.format_exc()
                 self.status = -1
+
         # default stdout and stderr
         if 'stdout' not in kwargs:
             kwargs['stdout'] = subprocess.PIPE
@@ -62,11 +67,10 @@ class Command(object):
         return self.status, self.output, self.error
 
 
-def pow(n1,n2):
-    return int(math.pow(int(n1),int(n2)))
+def pow(n1, n2):
+    return int(math.pow(int(n1), int(n2)))
 
 # def getCombinedCost(c1,c2):
 #     ic1 = int(c1)
 #     ic2 = int(c2)
 #     return int(max(ic1,ic2) **2 + min(ic1,ic2))
-

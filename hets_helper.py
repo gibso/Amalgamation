@@ -4,11 +4,14 @@ import glob
 
 hetsapi_url = os.environ['HETSAPI_INTERNAL_URL']
 
+
 def generate_th_files_from(file):
     return generate_files_from(file, 'th')
 
+
 def generate_xml_file_from(file):
     return generate_files_from(file, 'xml')[0]
+
 
 def generate_files_from(file, output_type):
     filesParam = {'file': file}
