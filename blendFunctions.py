@@ -1,9 +1,6 @@
 from clingo import *
-import os, sys, time, subprocess, threading, shlex
 from settings import *
 from langCasl import *
-from itertools import *
-import json
 import hets_helper
 
 

@@ -8,20 +8,20 @@ The keyword  #script (python) is used to tell clingo to call python.
 
 # First we need to etermine the path we are in.
 # Some auxiliary libraries that we need:
-import os, sys, time, subprocess
+import os, sys
 
 # Set path for additional import files
 lp_path = os.path.abspath(os.getcwd())
 sys.path.append(lp_path)
 
 # The gringo library contains all important python methods used by clingo.
-from clingo import *
+import clingo
 
 # We also want to be able to call the other amalgamation module python scripts.
 from settings import *
 from langCasl import *
-from blendFunctions import *
-from auxFunctions import *
+import blendFunctions
+import json
 
 # print("starting generalisation")
 
@@ -44,14 +44,14 @@ def onModelGeneralize(model):
     modelStr = getModel(model)
     ## print(modelStr)
     # return
-    [blends, blendingGeneralizationValue] = findLeastGeneralizedBlends(model.symbols(), inputSpaces, highestValue,
+    [blends, blendingGeneralizationValue] = blendFunctions.findLeastGeneralizedBlends(model.symbols(), inputSpaces, highestValue,
                                                                        blends)
     # print(blendingGeneralizationValue)
     if blendingGeneralizationValue >= highestValue and blendingGeneralizationValue > -float("inf"):
         highestValue = blendingGeneralizationValue
 
         # writeBlends(blends)
-        jsonOutput = writeJsonOutput(blends, inputSpaceNames)
+        jsonOutput = blendFunctions.writeJsonOutput(blends, inputSpaceNames)
 
         # print(jsonOutput)
 
@@ -129,9 +129,9 @@ def main(prg):
         prg.ground(parts)
         parts = []
         # Release the query1(t) atom from the last slice (step-1) from the program. 
-        prg.release_external(Function("query", [stepGeneralize - 1]))
+        prg.release_external(clingo.Function("query", [stepGeneralize - 1]))
         # Add the atom query1(t) of this slice to the program. 
-        prg.assign_external(Function("query", [stepGeneralize]), True)
+        prg.assign_external(clingo.Function("query", [stepGeneralize]), True)
 
         # Find Stable Models for this generalization iteration
         ret = prg.solve(None, onModelGeneralize)
@@ -140,7 +140,7 @@ def main(prg):
         #         printModel(model)                
 
         # If Stable Models are found and we are beyond the minimal number of slices, break loop.
-        if stepGeneralize >= (imin - 1) and (ret == SolveResult.satisfiable): break
+        if stepGeneralize >= (imin - 1) and (ret == clingo.SolveResult.satisfiable): break
         stepGeneralize = stepGeneralize + 1
 
 #end.

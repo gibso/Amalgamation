@@ -1,8 +1,8 @@
-from langCasl import *
+import langCasl
 import os, glob
 import subprocess
 import hets_helper
-from settings import *
+import settings
 
 
 def remove_all_output_files():
@@ -13,18 +13,18 @@ def remove_all_output_files():
 
 remove_all_output_files()
 
-fName = inputFile
+fName = settings.inputFile
 
 # Generate an xml file from a CASL input file. 
-inputSpacesXmlFileName = input2Xml(fName, inputSpaceNames)
-inputSpaces = parseXml(inputSpacesXmlFileName)
+inputSpacesXmlFileName = langCasl.input2Xml(fName, settings.inputSpaceNames)
+inputSpaces = langCasl.parseXml(inputSpacesXmlFileName)
 print("blending the following CASL specs:")
 for s in inputSpaces:
     print(s.toCaslStr())
 print("\n\n\n")
 # raw_input()
 # Generate the Logic Programming representation of the CASL input spaces. 
-lpRep = toLP(inputSpaces)
+lpRep = langCasl.toLP(inputSpaces)
 lpRep = "#program base.\n\n" + lpRep
 generic_file_name = hets_helper.get_generic_filename_for(filename=fName)
 lpFileName = f'/data/{generic_file_name}.lp'
@@ -33,5 +33,5 @@ lpFile.write(lpRep)
 lpFile.close()
 print("Generated Logic Programming facts from CASL Spec.")
 
-subprocess.call(["clingo", "--number=" + str(numModels), "--quiet", "iterationGeneralize.py.lp", "caslInterface.lp",
+subprocess.call(["clingo", "--number=" + str(settings.numModels), "--quiet", "iterationGeneralize.py.lp", "caslInterface.lp",
                  "generalize.lp", lpFileName])
