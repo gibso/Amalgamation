@@ -17,10 +17,12 @@ def input2Xml(fName, input_spaces):
     casl_file = open(fName, 'rb')
     th_files = hets_helper.generate_th_files_from(casl_file)
 
+    generic_filename = hets_helper.get_generic_filename_for(filename=fName)
+
     # filter the th files for the two input spaces
     input_space_th_files = []
     for input_space in input_spaces:
-        input_space_th_files += list(filter(lambda file: input_space in file.name, th_files))
+        input_space_th_files += list(filter(lambda file: f'{generic_filename}_{input_space}' in file.name, th_files))
 
     # concatenante the two input space files into one new file
     new_file_content = ''
