@@ -7,9 +7,11 @@ RUN conda install --yes --channel potassco clingo
 RUN mkdir /opt/project
 WORKDIR /opt/project
 
-# copy requirements file and install python dependencies
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# copy setup file
+COPY setup.py .
 
-# start the blending process
-CMD ["python", "run-blending.py"]
+# install dependencies
+RUN  pip install -e .
+
+# start flask server
+CMD flask run --host=0.0.0.0
