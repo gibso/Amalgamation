@@ -18,9 +18,9 @@ sys.path.append(lp_path)
 import clingo
 
 # We also want to be able to call the other amalgamation module python scripts.
-from settings import *
-from langCasl import *
-import blendFunctions
+from amalgamation.settings import *
+from amalgamation.langCasl import *
+from amalgamation import blendFunctions
 import json
 
 # print("starting generalisation")

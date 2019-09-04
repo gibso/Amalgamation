@@ -1,6 +1,6 @@
 # This file contains classes that represent FOL expressions
 import copy
-from auxFunctions import *
+from amalgamation.auxFunctions import *
 import re
 
 

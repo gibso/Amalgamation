@@ -2,8 +2,8 @@ import xml.etree.ElementTree as ET
 import copy
 import re
 
-from auxFunctions import *
-import hets_helper
+from amalgamation.auxFunctions import *
+from amalgamation import hets_helper
 
 axMap = {}
 axEqClasses = {}

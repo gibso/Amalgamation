@@ -1,7 +1,7 @@
 from clingo import *
-from settings import *
-from langCasl import *
-import hets_helper
+from amalgamation.settings import *
+from amalgamation.langCasl import *
+from amalgamation import hets_helper
 
 
 def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
