@@ -16,7 +16,7 @@ def generate_xml_file_from(file):
 def generate_files_from(file, output_type):
     filesParam = {'file': file}
     th_generator_url = f"http://{hetsapi_url}/generator/{output_type}"
-    print(f'requst to hets to generate .{output_type} files.')
+    print(f'request to hets to generate .{output_type} files.')
     res = requests.post(th_generator_url, files=filesParam)
     if res.status_code != 204:
         raise Exception(f'could not generate .{output_type} files.')
