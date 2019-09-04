@@ -176,8 +176,8 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
 
                 blends.append(blendInfo)
 
-    os.system("rm -rf *.tptp")
-    os.remove("/data/amalgam_tmp.casl")
+    # os.system("rm -rf *.tptp")
+    # os.remove("/data/amalgam_tmp.casl")
 
     return [blends, highestValue]
 
@@ -298,8 +298,8 @@ def writeJsonOutput(blends, inputSpaceNames):
 
 # This function takes a list of blend speciications and writes them to disk.
 def generateBlend(blend):
-    os.system("rm -rf Blend_*.casl")
-    os.system("rm -rf Blend_*.th")
+    # os.system("rm -rf Blend_*.casl")
+    # os.system("rm -rf Blend_*.th")
     bNum = 0
     blendFilesList = ''
 
@@ -334,7 +334,7 @@ def generateBlend(blend):
     outFile.close()
 
     # os.system("cp " + thName + " " + thName[:-3]+".casl")
-    os.system("rm -rf *.th")
+    # os.system("rm -rf *.th")
     # blendFilesList += thName[:-3]+".casl\n"
     blendFilesList += fName
 
@@ -351,8 +351,8 @@ def generateBlend(blend):
 def writeBlends(blends):
     global genExplicitBlendFiles
     # raw_input
-    os.system("rm -rf Blend_*.casl")
-    os.system("rm -rf Blend_*.th")
+    # os.system("rm -rf Blend_*.casl")
+    # os.system("rm -rf Blend_*.th")
     bNum = 0
     blendFilesList = ''
     for blend in blends:
@@ -401,7 +401,7 @@ def writeBlends(blends):
 
         if genExplicitBlendFiles == True:
             os.system("cp " + thName + " " + thName[:-3] + ".casl")
-            os.system("rm -rf *.th")
+            # os.system("rm -rf *.th")
             blendFilesList += thName[:-3] + ".casl\n"
 
         # blendFilesList += fName
@@ -509,7 +509,7 @@ def checkConsistencyEprover(blendTptpName):
     res = resFile.read()
     resFile.close()
 
-    os.system("rm -rf consistencyRes.log")
+    # os.system("rm -rf consistencyRes.log")
 
     if res.find("# No proof found!") != -1 or res.find("# Failure: Resource limit exceeded") != -1:
         print("Eprover: No consistency proof found.")
