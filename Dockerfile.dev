@@ -7,8 +7,8 @@ RUN conda install --yes --channel potassco clingo
 RUN mkdir /opt/project
 WORKDIR /opt/project
 
-# copy everything
-COPY . .
+# copy setup file
+COPY setup.py .
 
 # install dependencies
 RUN  pip install -e .
