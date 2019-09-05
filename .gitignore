@@ -1,12 +1,21 @@
-amalgamation.sublime-workspace
-blend.json
-Blend_v3234__G7_2_Bbmin_3_b_0.casl
-blendFiles.txt
-examples/demo_examples/tritone_demo.lp
-examples/demo_examples/tritone_demo_raw.casl
-
-# JetBrin IDE Files
+# IDE Files
 /.idea/
+amalgamation.sublime-workspace
 
 # Python compiled files
 *.pyc
+
+venv/
+
+*.pyc
+__pycache__/
+
+instance/
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+dist/
+build/
+*.egg-info/
