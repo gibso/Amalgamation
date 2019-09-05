@@ -1,7 +1,7 @@
-FROM continuumio/anaconda3:latest
+FROM continuumio/anaconda3:2019.07
 
 # install patassco clingo
-RUN conda install --yes --channel potassco clingo
+RUN /opt/conda/bin/conda install --yes --channel potassco clingo
 
 # add workdir for mounting the project
 RUN mkdir /opt/project
@@ -11,7 +11,7 @@ WORKDIR /opt/project
 COPY setup.py .
 
 # install dependencies
-RUN  pip install -e .
+RUN /opt/conda/bin/pip install -e .
 
 # start flask server
-CMD flask run --host=0.0.0.0
+CMD /opt/conda/bin/flask run --host=0.0.0.0

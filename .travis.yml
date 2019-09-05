@@ -7,4 +7,4 @@ before_script:
   - docker build -t gibso/amalgamation .
 
 script:
-  - docker run gibso/amalgamation pytest
+  - docker run gibso/amalgamation /opt/conda/bin/pytest
