@@ -20,6 +20,7 @@ import clingo
 # We also want to be able to call the other amalgamation module python scripts.
 from amalgamation.settings import *
 from amalgamation.langCasl import *
+from amalgamation.input_metadata import InputMetadata
 from amalgamation import blendFunctions
 import json
 
@@ -92,6 +93,10 @@ def main(prg):
 
     ## Prepare internal data structure for the later blending. 
     global inputSpaceNames, inputSpaces, inputFile
+
+    input = InputMetadata()
+    inputFile = input.inputFile
+    inputSpaceNames = input.inputSpaceNames
 
     print("Starting main iteration loop. Reading input spaces.")
 

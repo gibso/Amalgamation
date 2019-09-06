@@ -1,0 +1,25 @@
+spec Global =
+    generated type Concept ::= house | home | building | dwelling |  water | ship | boat | vessel
+    preds
+        RelatedTo : Concept * Concept
+end
+
+spec House = Global then
+    ops house : Concept
+        home : Concept
+        building : Concept
+        dwelling : Concept
+    . RelatedTo(house,building)
+    . RelatedTo(house,home)
+    . RelatedTo(house,dwelling)
+end
+
+spec Boat = Global then
+    ops water : Concept
+        ship : Concept
+        boat : Concept
+        vessel : Concept
+    . RelatedTo(boat,water)
+    . RelatedTo(boat,ship)
+    . RelatedTo(boat,vessel)
+end

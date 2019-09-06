@@ -1,28 +1,29 @@
 from flask import Blueprint, request, jsonify
 import tempfile
 import json
-from amalgamation import settings, run_blending
+from amalgamation import run_blending
+import os
+import glob
 
 bp = Blueprint('amalgamation', __name__)
 
 
 @bp.route('/amalgamation', methods=['POST'])
 def run_amalgamation():
+    remove_all_output_files()
+
     input_spec_file = save_request_file_temporary(request)
     input_space_names = json.loads(request.form.get('input-space-names'))
+    save_input_metadata(input_spec_file, input_space_names)
 
-    settings.inputFile = input_spec_file.name
-    settings.inputSpaceNames = input_space_names
-
-    append_input_data_to_settings(input_spec_file, input_space_names)
     run_blending.run_blending()
-    remove_input_data_from_settings()
 
     blendFile = open('/data/blend.json')
     blend = json.loads(blendFile.read())
     blendFile.close()
 
     return jsonify(blend)
+
 
 def save_request_file_temporary(request):
     request_file = request.files['file']
@@ -33,20 +34,17 @@ def save_request_file_temporary(request):
     return tmpfile
 
 
-# this is reeaally hacky, but at the moment
-# i dont see an other way to inform the
-# clingo process about the input space data
-def append_input_data_to_settings(input_spec_file, input_space_names):
-    settings_file = open('amalgamation/settings.py', 'a')
-    settings_file.write(f'inputFile = "{input_spec_file.name}"\n'
-                        f'inputSpaceNames = ["{input_space_names[0]}", "{input_space_names[1]}"]\n')
-    settings_file.close()
+def save_input_metadata(input_spec_file, input_space_names):
+    f = open("/data/input.json", "w+")
+    metadata = {
+        'inputFile': input_spec_file.name,
+        'inputSpaceNames': input_space_names
+    }
+    f.write(json.dumps(metadata))
+    f.close()
 
 
-def remove_input_data_from_settings():
-    settings_file = open('amalgamation/settings.py')
-    lines = settings_file.readlines()
-    settings_file.close()
-    settings_file = open('amalgamation/settings.py', 'w')
-    settings_file.writelines([item for item in lines[:-2]])
-    settings_file.close()
+def remove_all_output_files():
+    fileList = glob.glob(f'/data/*')
+    for fileName in fileList:
+        os.remove(fileName)
