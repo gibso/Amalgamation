@@ -2,7 +2,7 @@ import requests
 import os
 import glob
 
-hetsapi_url = os.environ['HETSAPI_INTERNAL_URL']
+hetsapi_host = os.environ['HETSAPI_HOST']
 
 
 def generate_th_files_from(file):
@@ -15,7 +15,7 @@ def generate_xml_file_from(file):
 
 def generate_files_from(file, output_type):
     filesParam = {'file': file}
-    th_generator_url = f"http://{hetsapi_url}/generator/{output_type}"
+    th_generator_url = f"http://{hetsapi_host}/generator/{output_type}"
     print(f'request to hets to generate .{output_type} files.')
     res = requests.post(th_generator_url, files=filesParam)
     if res.status_code != 204:
