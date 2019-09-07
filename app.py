@@ -1,0 +1,1 @@
+from amalgamation import create_app
