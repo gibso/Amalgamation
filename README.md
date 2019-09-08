@@ -1,4 +1,4 @@
-COINVENT Amalgamation Module 									
+COINVENT Amalgamation Module [![Build Status](https://travis-ci.com/gibso/Amalgamation.svg?branch=master)](https://travis-ci.com/gibso/Amalgamation)
 =================================
 
 This project is a fork of the [original Amalgamation Module by Manfred Eppe](https://github.com/meppe/Amalgamation) and is part of the [Orpheus Application](https://github.com/gibso/orpheus-dev).
