@@ -18,7 +18,7 @@ def test_tritone_demo(client):
 
 def test_house_boat(client):
     # open file as binary
-    file = open('tests/examples/concept_net/house_boat.casl', 'rb')
+    file = open('tests/examples/concept_net/house_boat_minimal.casl', 'rb')
     data = {
         'file': file,
         'input-space-names': json.dumps(['House', 'Boat'])
