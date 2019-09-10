@@ -13,6 +13,10 @@ def generate_xml_file_from(file):
     return generate_files_from(file, 'xml')[0]
 
 
+def generate_tptp_files_from(file):
+    return generate_files_from(file, 'tptp')
+
+
 def generate_files_from(file, output_type):
     filesParam = {'file': file}
     th_generator_url = f"http://{hetsapi_host}/generator/{output_type}"
