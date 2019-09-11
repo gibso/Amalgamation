@@ -117,33 +117,18 @@ def findLeastGeneralizedBlends(modelAtoms, inputSpaces, highestValue, blends):
 
             print("Checking consistency of " + blendName + "")
             # generate tptp format of theory and call eprover to check consistency
-            blendTptpName = "amalgamTmp_" + blendName + ".tptp"
-            tries = 0
+            
+            ###TBD call HETS API
+            amalgam_tmp_file = open(amalgam_tmp_filepath, 'rb')
+            tptp_files = hets_helper.generate_tptp_files_from(amalgam_tmp_file)
+            print("Done generating tptp")
 
-            # Try to generate input files several times. This is neccesary due to strange file writing bug. 
-            while True:
+            blendTptpName = "/data/amalgam_tmp_" + blendName + ".tptp"
+            blend_tptp_file = list(filter(lambda file: file.name == blendTptpName, tptp_files))[0]
 
-                if os.path.isfile(blendTptpName):
-                    blendFileSize = os.stat(blendTptpName).st_size
-                else:
-                    blendFileSize = 0
+            print(blend_tptp_file.name)
 
-                if blendFileSize != 0:
-                    break
-
-                print("generating tptp because " + blendTptpName + " file was not found")
-                ###TBD call HETS API
-                amalgam_tmp_file = open(amalgam_tmp_filepath, 'rb')
-                tptp_files = hets_helper.generate_tptp_files_from(amalgam_tmp_file)
-                print("Done generating tptp")
-                # This is a hack because hets sometimes seems to not generate all .tptp files. So we just try again and again until its working. 
-                tries = tries + 1
-                if tries > 15:
-                    print("ERROR: File " + blendTptpName + " not yet written correctly " + str(
-                        tries) + " times! Aborting...")
-                    exit(1)
-
-            thisCombiConsistent = checkConsistency(blendTptpName)
+            thisCombiConsistent = checkConsistency(blend_tptp_file.name)
             # skip tptp generation and consitency checking because tptp file creation with hets is buggy
             # thisCombiConsistent = 1
 
