@@ -19,3 +19,6 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+
+# eprover log
+consistencyRes.log
