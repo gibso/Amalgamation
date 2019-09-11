@@ -27,5 +27,11 @@ def run_blending():
     lpFile.close()
     print("Generated Logic Programming facts from CASL Spec.")
 
-    subprocess.call(["/opt/conda/bin/clingo", "--number=" + str(settings.numModels), "--quiet", "amalgamation/iterationGeneralize.py.lp", "amalgamation/caslInterface.lp",
-                     "amalgamation/generalize.lp", lpFileName])
+    subprocess.call([
+        "/opt/conda/bin/clingo",
+        "--number=" + str(settings.numModels),
+        "--quiet", "amalgamation/iterationGeneralize.py.lp",
+        "amalgamation/caslInterface.lp",
+        "amalgamation/generalize.lp",
+        lpFileName
+    ])
