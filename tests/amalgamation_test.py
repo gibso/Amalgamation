@@ -12,8 +12,8 @@ def test_tritone_demo(client):
     response = client.post('/amalgamation', data=data, content_type='multipart/form-data')
 
     assert response.status_code == status.HTTP_200_OK
-    assert list(response.json.keys()) == ['blend', 'blendId', 'blendName', 'cost', 'genericSpace', 'input1', 'input2']
-    assert response.json['blendName'] == 'Blend_v39__G7_0_Bbmin_0'
+    assert list(response.json[0].keys()) == ['blend', 'blendId', 'blendName', 'cost', 'genericSpace', 'input1', 'input2']
+    assert response.json[0]['blendName'] == 'Blend_v39__G7_0_Bbmin_0'
 
 
 def test_house_boat(client):
@@ -26,5 +26,5 @@ def test_house_boat(client):
     response = client.post('/amalgamation', data=data, content_type='multipart/form-data')
 
     assert response.status_code == status.HTTP_200_OK
-    assert list(response.json.keys()) == ['blend', 'blendId', 'blendName', 'cost', 'genericSpace', 'input1', 'input2']
-    assert response.json['blendName'] == 'Blend_v8__House_0_Boat_0'
+    assert list(response.json[0].keys()) == ['blend', 'blendId', 'blendName', 'cost', 'genericSpace', 'input1', 'input2']
+    assert response.json[0]['blendName'] == 'Blend_v8__House_0_Boat_0'
