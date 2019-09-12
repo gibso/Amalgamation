@@ -45,6 +45,12 @@ def onModelGeneralize(model):
     modelStr = getModel(model)
     ## print(modelStr)
     # return
+
+    # dont create the same blends again
+    if len(blends):
+        print('blends already exist.')
+        return
+
     [blends, blendingGeneralizationValue] = blendFunctions.findLeastGeneralizedBlends(model.symbols(atoms=True), inputSpaces, highestValue,
                                                                        blends)
     # print(blendingGeneralizationValue)
