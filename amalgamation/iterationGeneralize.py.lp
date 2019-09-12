@@ -58,20 +58,24 @@ def onModelGeneralize(model):
 
         blendJsonList = jsonOutput['blendList']
 
-        for blendJson in blendJsonList:
+        outFile = open('/data/blend_list.json', "w")
+        outFile.write(json.dumps(blendJsonList))
+        outFile.close()
 
-            # os.system("rm -rf blend.json")
-            outFile = open('/data/blend.json', "w")
-            outFile.write(json.dumps(blendJson))
-            # print(blendJson)
-            outFile.close()
-
-            print('Other blend? (n) ')
-            sys.stdout.flush()
-            x = 'n'
-
-            if x == 'n':
-                break;
+        # for blendJson in blendJsonList:
+        #
+        #     # os.system("rm -rf blend.json")
+        #     outFile = open('/data/blend.json', "w")
+        #     outFile.write(json.dumps(blendJson))
+        #     # print(blendJson)
+        #     outFile.close()
+        #
+        #     print('Other blend? (n) ')
+        #     sys.stdout.flush()
+        #     x = 'n'
+        #
+        #     if x == 'n':
+        #         break;
         print('finished')
         sys.stdout.flush()
         # print("Found blend with a better or equal generalization value of  " + str(highestValue) + ".")

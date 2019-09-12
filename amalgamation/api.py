@@ -18,11 +18,11 @@ def run_amalgamation():
 
     run_blending.run_blending()
 
-    blendFile = open('/data/blend.json')
-    blend = json.loads(blendFile.read())
-    blendFile.close()
+    blend_list_file = open('/data/blend_list.json')
+    blend_list = json.loads(blend_list_file.read())
+    blend_list_file.close()
 
-    return jsonify(blend)
+    return jsonify(blend_list)
 
 
 def save_request_file_temporary(request):
