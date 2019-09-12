@@ -45,7 +45,7 @@ def onModelGeneralize(model):
     modelStr = getModel(model)
     ## print(modelStr)
     # return
-    [blends, blendingGeneralizationValue] = blendFunctions.findLeastGeneralizedBlends(model.symbols(), inputSpaces, highestValue,
+    [blends, blendingGeneralizationValue] = blendFunctions.findLeastGeneralizedBlends(model.symbols(atoms=True), inputSpaces, highestValue,
                                                                        blends)
     # print(blendingGeneralizationValue)
     if blendingGeneralizationValue >= highestValue and blendingGeneralizationValue > -float("inf"):
@@ -81,7 +81,7 @@ def onModelGeneralize(model):
 def getModel(model):
     print("%% Generalisation model is as follows : \n")
     mStr = ''
-    for a in model.symbols():
+    for a in model.symbols(atoms=True):
         mStr += str(a) + ".\n"
     return mStr
 
