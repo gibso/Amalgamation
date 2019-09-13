@@ -465,9 +465,9 @@ def getBlendCombiCost(genInputSpaces):
 def checkConsistency(blendTptpName):
     consistent = checkConsistencyEprover(blendTptpName)
 
-    if consistent == -1:
-        print("Consistency could not be determined by eprover, trying darwin")
-        consistent = checkConsistencyDarwin(blendTptpName)
+    # if consistent == -1:
+        # print("Consistency could not be determined by eprover, trying darwin")
+        # consistent = checkConsistencyDarwin(blendTptpName)
         # if consistent == 0 or consistent == 1:
         # os.system("echo \"eprover could not determine inconsistency but darwn could for blend " + blendTptpName + "\" > consistencyCheckFile.tmp")
         # print("eprover could not determine (in)consistency but darwn could for blend " + blendTptpName + ". Result: " + str(consistent) + ". Press key to continue."))
@@ -478,19 +478,13 @@ def checkConsistency(blendTptpName):
 
 def checkConsistencyEprover(blendTptpName):
     global eproverTimeLimit
-    tries = 0
-    while not os.path.isfile("consistencyRes.log"):
-        resFile = open("consistencyRes.log", "w")
-        subprocess.call(["eprover", "--auto", "--tptp3-format", "--cpu-limit=" + str(eproverTimeLimit), blendTptpName],
-                        stdout=resFile)
-        resFile.close()
 
-        if tries > 5:
-            print("ERROR!!! File consistencyRes.log not written by eprover after " + str(tries) + " tries. Aborting...")
-            exit(0)
-        tries = tries + 1
+    resFile = open("/data/consistencyRes.log", "w")
+    subprocess.call(["eprover", "--auto", "--tptp3-format", "--cpu-limit=" + str(eproverTimeLimit), blendTptpName],
+                    stdout=resFile)
+    resFile.close()
 
-    resFile = open("consistencyRes.log", 'r')
+    resFile = open("/data/consistencyRes.log", 'r')
     res = resFile.read()
     resFile.close()
 
