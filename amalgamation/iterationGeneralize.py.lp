@@ -47,7 +47,7 @@ def onModelGeneralize(model):
     # return
 
     # dont create the same blends again
-    if len(blends):
+    if os.path.isfile('/data/blend_list.json'):
         print('blends already exist.')
         return
 
