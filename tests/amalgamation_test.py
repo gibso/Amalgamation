@@ -13,7 +13,7 @@ def test_tritone_demo(client):
 
     assert response.status_code == status.HTTP_200_OK
     assert list(response.json[0].keys()) == ['blend', 'blendId', 'blendName', 'cost', 'genericSpace', 'input1', 'input2']
-    assert response.json[0]['blendName'] == 'Blend_v39__G7_0_Bbmin_0'
+    assert response.json[0]['blendName'] == 'Blend_v32__G7_1_Bbmin_3'
 
 
 def test_house_boat(client):

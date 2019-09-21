@@ -7,6 +7,6 @@ before_script:
   - docker build -t gibso/amalgamation .
   - docker pull gibso/hets-api
   - docker network create amalgamation
+  - docker volume create data
 script:
-  - docker run -d -v data:/data --network="amalgamation" --name="hets-api" gibso/hets-api
-  - docker run -v data:/data --network="amalgamation" -e "HETSAPI_HOST=hets-api:5000" gibso/amalgamation /opt/conda/bin/pytest
+  - docker run --rm -d -v data:/data --network="amalgamation" --name="hets-api" gibso/hets-api && docker run --rm -v data:/data --network="amalgamation" -e "HETSAPI_HOST=hets-api:5000" gibso/amalgamation /opt/conda/bin/pytest
