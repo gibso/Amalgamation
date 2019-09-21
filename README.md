@@ -3,6 +3,8 @@ COINVENT Amalgamation Module [![Build Status](https://travis-ci.com/gibso/Amalga
 
 This project is a fork of the [original Amalgamation Module by Manfred Eppe](https://github.com/meppe/Amalgamation) and is part of the [Orpheus Application](https://github.com/gibso/orpheus-dev).
 
+The [Orpheus Project](https://github.com/gibso/orpheus) implements a computational framework for conceptual blending with mental spaces extracted from the [ConceptNet knowledge base](https://github.com/commonsense/conceptnet5).
+
 ### Overview
 In this fork, the amalgamation module is embedded into a flask server, and can be executed by an API call.
 Furthermore, the HETS dependency has been encapsulated into another project, called [hets-api](https://github.com/gibso/hets-api).
@@ -47,4 +49,4 @@ Now you can reach your amalgamation server at http://localhost:4000.
 - Manfred Eppe (meppe@iiia.csic.es)
 - Roberto Confalonieri (confalonieri@iiia.csic.es)
 - Ewen MacLean (ewenmaclean@gmail.com)
-- Oliver Görtz (oliver.goertz{at}gmail.com)
+- [Oliver Görtz](mailto:oliver.goertz@gmail.com)
