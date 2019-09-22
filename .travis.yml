@@ -4,9 +4,9 @@ services:
   - docker
 
 before_script:
-  - git clone https://github.com/gibso/hets-api.git && cd hets-api
-  - docker build -t hets-api . && cd ..
   - docker build -t amalgamation .
+  - git clone https://github.com/gibso/hets-api.git
+  - cd hets-api && docker build -t hets-api .
   - docker network create amalgamation
   - docker volume create data
 script:
